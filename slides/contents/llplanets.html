@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahe (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>LLPlanets slide</title>
+    <meta charset='utf-8'>
+    <script src='http://constellation.github.com/slides/slides.js'></script>
+    <style>
+    h2 a {
+      color: black !important;
+    }
+    h2 a:hover {
+      color: #999 !important;
+    }
+    </style>
+    <link rel="shortcut icon" href="http://25.media.tumblr.com/avatar_fccdd5b6c51d_16.png" />
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-regular template-io-2011'>
+      <article>
+        <h1>VM開発、しましょうか<br></h1>
+        <p>
+          <del>id:Constellation</del> Constなんとか
+          <br>
+          <br>
+          from Shibuya.js
+          <br>
+          <br>
+          Aug 20, 2011
+        </p>
+      </article>
+
+      <article>
+        <h3>自己紹介</h3>
+        <ul>
+        <li>id:Constellation</li>
+        <li>ECMAScripter / JavaScripter</li>
+        <li>Google Chrome拡張など(Taberareloo)</li>
+        <li>ECMA262 仕様厨</li>
+        </ul>
+      </article>
+
+      <article>
+        <h2>本日のTheme</h2>
+        <q>レッツ <ruby>背徳<rt>VM</rt></ruby>♪</q>
+        <div class='author'><a href="http://dic.nicovideo.jp/a/%E3%83%AC%E3%83%83%E3%83%84%E8%83%8C%E5%BE%B3">小鳥遊夜々</a></div>
+      </article>
+
+      <article>
+        <h3>前回(などありませんが)まであらすじ</h3>
+        <ul class="build">
+          <li>
+            <p>仕様厨</p>
+            <p>既存engineの仕様違反が気になってしまう</p>
+            <p>(Array.lengthに対するPropertyDescriptor指定など)</p>
+          </li>
+          <li>文句ばっか言ってないで自分で作れよ!!</li>
+          <li>作りました</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>ECMA262 5.1th engine : iv / lv5</h3>
+        <ul>
+          <li><a href="https://github.com/Constellation/iv">iv / lv5 : ECMA262 Engine</a></li>
+          <li>ECMAScript(JavaScript, ECMA262)のEngine</li>
+          <li>自分で直せるので仕様厨の自分も大満足(本人は)</li>
+          <li>超電磁砲打ちたい... lv5</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>今回の話</h3>
+        <ul class="build">
+          <li>ASTをそのまま実行するInterpreter</li>
+          <li>
+            <p>「JavaScriptのEngineを書いていらっしゃる」</p>
+            <p>「まあECMAScript(わざわざ言い換える)のAST Interpreterなんですけどね」</p>
+            <p>心苦しい + なんか悔しい</p>
+          </li>
+          <li>ちょっと衝撃的な速度</li>
+          <li>VMにしました</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>The Lv6 Shift Project</h3>
+        <ul>
+          <li>VM化project: Lv6 Shift</li>
+          <li>engineの速度を加速</li>
+          <li>accelerator</li>
+          <li>stack VM</li>
+          <li>railgun</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>こつこつ高速化</h3>
+        <ul>
+          <li>変数のstack割付</li>
+          <li>不要な抽象化のbytecode化による削除</li>
+          <li>非参照変数の削除</li>
+          <li>不要な環境hash tableは作らない</li>
+          <li>Heap変数のoffsetによる事前lookup</li>
+          <li>dead code elimination</li>
+          <li>GlobalObjectに対するproperty lookupのinline cache</li>
+          <li>Stringのrope表現</li>
+          <li>Symbolの表現の改善(64bit index畳み込み)</li>
+        </ul>
+      </article>
+
+      <article>
+        <h2>評価</h2>
+      </article>
+
+      <article>
+        <h3>SunSpider 1.0 Results at 2011/08/20</h3>
+        <p>みんな大好物benchmark, 中でも大好きSunSpider</p>
+        <br>
+        <div class="build">
+          <img class='centered' src="https://docs.google.com/spreadsheet/oimg?key=0AmZB4DDTfYb4dGt5enlNSW5DSXA0dmNVd1NGNU5OOXc&amp;oid=4&amp;zx=liyi3hc4z8h5" alt="2011/08/20 SunSpider 1.0 Results" />
+        </div>
+      </article>
+
+      <article>
+        <h3>adding lv5 interpreter(not VM) to it</h3>
+        <p>Interpreter版を入れると</p>
+        <br>
+        <div class="build">
+          <img class="centered" src="https://docs.google.com/spreadsheet/oimg?key=0AmZB4DDTfYb4dGt5enlNSW5DSXA0dmNVd1NGNU5OOXc&amp;oid=3&amp;zx=im2swk3j69ky" alt="and lv5 interpreter" />
+        </div>
+      </article>
+
+      <article>
+        <h3>lv5.next</h3>
+        <p>Polymorphic Inline Cacheを実装したい</p>
+        <p>最後に, 最適化を必死に積んでゆくその心構えをWebKitさんの方より</p>
+      </article>
+
+      <article>
+        <h3>Introducing SquerrlFish Extremeより</h3>
+        <q>「捕まらないインチキはしてもいいんだぜ？」</q>
+        <div class='author'><a href="http://trac.webkit.org/wiki/Introducing%20SquirrelFish%20Extreme.ja#a2.多相インラインキャッシュ">VM最適化について, 動的言語コミュニティより</a></div>
+      </article>
+
+      <article>
+        <h3>ありがとうございました</h3>
+        <p><a href='http://d.hatena.ne.jp/Constellation/'>id:Constellation</a></p>
+      </article>
+    </section>
+  </body>
+</html>

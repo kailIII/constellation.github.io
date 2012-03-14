@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<!--
+  slide template
+  original authors:
+           Luke Mahe (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>Programming Symposium 2012</title>
+    <meta charset='utf-8'>
+    <script src='http://constellation.github.com/slides/slides.js'></script>
+    <style>
+    h2 a {
+      color: black !important;
+    }
+    h2 a:hover {
+      color: #999 !important;
+    }
+    .bordered_icon {
+      width: 64px;
+      height: 64px;
+      padding: 2px;
+      border: 1px solid #DDD;
+    }
+    .profile_icon {
+      width: 32px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid #DDD;
+      margin-right: 5px;
+      line-height: 1.4;
+    }
+    .profile_text {
+      vertical-align: top;
+    }
+    .number {
+      text-align: right;
+    }
+    dl {
+      padding-left: 30px;
+    }
+    dt {
+      padding-left: 15px;
+      border-left: 15px solid #CCC;
+    }
+    dd {
+      margin-left: 0px;
+      padding-left: 100px;
+      border-left: 15px solid #CCC;
+      border-bottom: 15px solid #FFF;
+    }
+    .bytecode {
+      font-size: 20px;
+      line-height: 26px;
+    }
+    p.small {
+      margin-top: 10px;
+      line-height: 28px;
+      font-size: 24px;
+    }
+    </style>
+    <link rel="shortcut icon" href="http://25.media.tumblr.com/avatar_fccdd5b6c51d_16.png" />
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-regular template-io-2011'>
+      <article>
+        <h1>現代的 JavaScript エンジンの実装</h1>
+        <p>鈴木勇介</p>
+        <p class="small">慶應義塾大学 理工学部 3年／サイボウズ・ラボユース</p>
+        <br>
+        <p class="small">ECMA262の最新版5.1(June 2011)の仕様に忠実な処理系を実装した</p>
+        <p class="small">そしてTC39で策定されるConformance SuiteであるTest262にて完全に仕様に準拠していることを確認した</p>
+        <p class="small">更にこの処理系に対して各種最適化を行った</p>
+      </article>
+      <article>
+        <h3>仕様準拠度比較 1</h3>
+        <p>以下の状況で比較</p>
+        <dl>
+          <dt>Opera</dt><dd>11.51</dd>
+          <dt>Safari</dt><dd>5.1.1</dd>
+          <dt>Google Chrome</dt><dd>15.0.824.120</dd>
+          <dt>Firefox</dt><dd>8.0</dd>
+          <dt>lv5</dt><dd>今回開発した処理系</dd>
+        </dl>
+      </article>
+
+      <article>
+        <h3>仕様準拠度比較 2</h3>
+        <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>総数</th>
+            <th>pass</th>
+            <th>fail</th>
+            <th>仕様準拠度(%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Opera</td>
+            <td class="number">11029</td>
+            <td class="number">7276</td>
+            <td class="number">3753</td>
+            <td class="number">65.97</td>
+          </tr>
+          <tr>
+            <td>Safari</td>
+            <td class="number">11029</td>
+            <td class="number">10256</td>
+            <td class="number">773</td>
+            <td class="number">92.99</td>
+          </tr>
+          <tr>
+            <td>Google Chrome</td>
+            <td class="number">11029</td>
+            <td class="number">10611</td>
+            <td class="number">418</td>
+            <td class="number">96.21</td>
+          </tr>
+          <tr>
+            <td>Firefox</td>
+            <td class="number">11029</td>
+            <td class="number">10865</td>
+            <td class="number">164</td>
+            <td class="number">98.51</td>
+          </tr>
+          <tr>
+            <td>lv5</td>
+            <td class="number">11029</td>
+            <td class="number">11011</td>
+            <td class="number">18</td>
+            <td class="number">99.83</td>
+          </tr>
+        </tbody>
+        </table>
+        <p>残り18件についても, 仕様以上のことを要求しているものなので, 仕様は全てpassしている
+        <p>lv5は現行最も仕様準拠度が高い</p>
+      </article>
+
+      <article>
+        <h3>仕様準拠度比較 3</h3>
+        <img class="centered" src="graph.png" alt="Specification Conformance" />
+      </article>
+
+      <article>
+        <h3>仕様準拠度比較 4</h3>
+        <ul>
+          <li>V8, SpiderMonkey etc.は不可
+          <li>Test262, <a href="http://hg.ecmascript.org/tests/test262/file/e7c51e48f6f4/test/suite/ch15/15.2/15.2.3/15.2.3.7/15.2.3.7-6-a-112.js">15.2.3.7-6-a-112.js</a>
+        </ul>
+        <pre style="font-size:20px;line-height:26px;" >function testcase() {
+  var arr = [0, 1];
+  Object.defineProperty(arr, "1", {
+    value: 1,
+    configurable: false
+  });
+  try {
+    Object.defineProperties(arr, {
+        length: { value: 1 }
+    });
+    return false;
+  } catch (ex) {
+    var desc = Object.getOwnPropertyDescriptor(arr, "length");
+    return ex instanceof TypeError &amp;&amp; desc.value === 2 &amp;&amp;
+      desc.writable &amp;&amp; !desc.enumerable &amp;&amp; !desc.configurable;
+  }
+}</pre>
+      </article>
+
+      <article>
+        <h3>変数解析</h3>
+        <ul>
+          <li>ECMA262 5.1thに合わせた変数の解析と最適化
+          <li>変数
+            <ul>
+              <li>STACK変数
+              <li>HEAP変数
+            </ul>
+          </li>
+          <li>参照
+            <ul>
+              <li>STACK参照
+              <li>HEAP参照
+              <li>DYNAMIC参照
+            </ul>
+          </li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>変数</h3>
+        <dl>
+          <dt>STACK変数</dt><dd>STACK上に割りつけられる局所変数</dd>
+          <dt>HEAP変数</dt><dd>HEAP environment上に割りつけられる変数(Closure時の変数など)</dd>
+        </dl>
+      </article>
+
+      <article>
+        <h3>参照</h3>
+        <dl>
+          <dt>STACK参照</dt><dd>STACK変数に対する参照</dd>
+          <dt>HEAP参照</dt><dd>HEAP変数に対する最適化された参照, 環境さかのぼりと配列accessにまで最適化される</dd>
+          <dt>DYNAMIC参照</dt><dd>HEAP変数に対する最適化されていない参照, 辞書を引きながら上の環境を辿る</dd>
+          <dt>GLOBAL参照</dt><dd>Global環境の変数であることがわかっている参照</dd>
+        </dl>
+      </article>
+
+      <article>
+        <h3>STACK変数 / STACK参照</h3>
+        <p>STACK変数iとそこへのSTACK参照</p>
+        <pre>function outer() {
+  var i = 20;
+  print(i);
+}</pre>
+<pre class="bytecode">
+[code] depth: 4 local: 1 heap: 0
+00000: PUSH_INT32 20
+00002: STORE_LOCAL 0
+00004: POP_TOP
+00005: CALL_GLOBAL 1 0 0
+00009: LOAD_LOCAL 0
+00011: CALL 1
+00013: POP_TOP
+00014: STOP_CODE
+</pre>
+        <p>STACKへのindexによるaccess</p>
+      </article>
+
+      <article>
+        <h3>HEAP変数 / HEAP参照</h3>
+        <p>HEAP変数iとそこへのHEAP参照</p>
+        <pre>function outer() {
+  var i = 20;
+  function inner() {
+    print(i);
+  }
+}</pre>
+<pre class="bytecode">
+[code] depth: 1 local: 0 heap: 1
+00000: BUILD_ENV 1
+00002: INSTANTIATE_HEAP_BINDING 0 0 0
+00006: PUSH_INT32 20
+00008: STORE_HEAP 0 0 0  // sym0, 0番目の環境, offset 0
+00012: POP_TOP
+00013: STOP_CODE
+</pre>
+        <p>lookup時, outerの環境のiにaccessすることはparse時に判明済み</p>
+      </article>
+
+      <article>
+        <h3>HEAP変数 / DYNAMIC参照</h3>
+        <p>HEAP変数iとそこへのDYNAMIC参照</p>
+        <p>もしかすると, obj.iにtrapされうるので, parse時に判別不可</p>
+        <pre>function outer() {
+  var i = 20;
+  function inner() {
+    with (obj) {
+      print(i);
+} } }</pre>
+<pre class="bytecode">
+[code] depth: 3 local: 0 heap: 0
+00000: LOAD_GLOBAL 0 0 0
+00004: WITH_SETUP
+00005: CALL_NAME 1  // printの参照
+00007: LOAD_NAME 2  // iの参照
+00009: CALL 1
+00011: POP_TOP
+00012: POP_ENV
+00013: STOP_CODE
+</pre>
+      </article>
+
+      <article>
+        <h3>GLOBAL参照</h3>
+        <pre>function outer() {
+  print(i);
+}</pre>
+<pre class="bytecode">
+[code] depth: 3 local: 0 heap: 0
+00000: CALL_GLOBAL 0 0 0
+00004: LOAD_GLOBAL 1 0 0
+00008: CALL 1
+00010: POP_TOP
+00011: STOP_CODE
+</pre>
+        <p>iはGlobal上にあるかもしれないが, 少なくともouterのscopeなど既存のscopeにはない</p>
+        <p>lookup時, Globalに対してのみlookupを行う</p>
+      </article>
+
+      <article>
+        <h3>with最適化</h3>
+        <p>withの内部で見つかる場合, DYNAMICにしない</p>
+        <pre>function with_not_dynamic() {
+  with (obj) {
+    function inner() {
+      var j = 20;
+      print(j);  // DYNAMICでない
+} } }</pre>
+<pre class="bytecode">
+[code] depth: 4 local: 1 heap: 0
+00000: PUSH_INT32 20
+00002: STORE_LOCAL 0
+00004: POP_TOP
+00005: CALL_NAME 2
+00007: LOAD_LOCAL 0  // DYNAMICでない
+00009: CALL 1
+00011: POP_TOP
+00012: STOP_CODE
+</pre>
+      </article>
+
+      <article>
+        <h3>direct call to eval</h3>
+        <pre>function eval_dynamic() {
+  eval("var i = 20");
+  print(i);
+}</pre>
+<pre class="bytecode">
+[code] depth: 3 local: 0 heap: 1
+00000: BUILD_ENV 1
+00002: INSTANTIATE_HEAP_BINDING 0 0 0
+00006: BUILD_ARGUMENTS 0  // arguments実体化
+00008: STORE_HEAP 0 0 0
+00012: POP_TOP
+00013: CALL_NAME 1  // evalのlookupがDYNAMIC
+00015: LOAD_CONST 0
+00017: EVAL 1
+00019: POP_TOP
+00020: CALL_NAME 2  // printのlookupがDYNAMIC
+00022: LOAD_NAME 3  // iのlookupがDYNAMIC
+00024: CALL 1
+00026: POP_TOP
+00027: STOP_CODE
+</pre>
+        <p>evalによる変数にtrapされるかどうかはparse時には不明なのでDYNAMIC参照</p>
+      </article>
+
+      <article>
+        <h3>strict mode下最適化</h3>
+        <p>ECMA262 5thで導入されたstrict modeの制限により条件が制限され, 最適化できる場合</p>
+        <ol>
+          <li>arguments環境連携削除
+          <li>eval最適化
+        </ol>
+      </article>
+
+      <article>
+        <h3>arguments環境連携削除</h3>
+        <p>通常環境と連携しているが, strict mode下では環境と連携していないことによる最適化</p>
+        <pre>function normal(x) {
+    arguments[0] = 20;
+      console.assert(x === 20);
+}
+normal(10);
+function strict(x) {
+    "use strict";
+      arguments[0] = 20;
+        console.assert(x === 10);
+}
+strict(10);</pre>
+      </article>
+
+    <article>
+        <h3>eval最適化</h3>
+        <p>evalがscopeを汚さないことを利用する最適化</p>
+<pre>function normal() {
+  var i = 20;
+  function outer(str) {
+    eval(str);
+    function inner() {
+      print(i);
+} } }
+function strict() {
+  "use strict";
+  var i = 20;
+  function outer(str) {
+    eval(str);
+    function inner() {
+      print(i);
+} } }</pre>
+    </article>
+    <article>
+      <h3>Benchmark(SunSpider)評価結果</h3>
+        <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th class="number">所要時間(ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>lv5最適化前</td>
+            <td class="number">55000</td>
+          </tr>
+          <tr>
+            <td>lv5最適化後</td>
+            <td class="number">1830</td>
+          </tr>
+          <tr>
+            <td>Opera</td>
+            <td class="number">212</td>
+          </tr>
+          <tr>
+            <td>Safari</td>
+            <td class="number">183</td>
+          </tr>
+          <tr>
+            <td>Google Chrome</td>
+            <td class="number">214</td>
+          </tr>
+          <tr>
+            <td>Firefox</td>
+            <td class="number">223</td>
+          </tr>
+          <tr>
+            <td>SpiderMonkey JIT無効</td>
+            <td class="number">950</td>
+          </tr>
+          <tr>
+            <td>SpiderMonkey C</td>
+            <td class="number">3657</td>
+          </tr>
+        </tbody>
+        </table>
+        <p>最適化前の20倍の高速化</p>
+        <p>しかし, 未だ主要処理系に対して10倍程度遅い</p>
+    </article>
+  </body>
+</html>

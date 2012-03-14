@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahe (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>Taberareloo Slide</title>
+    <meta charset='utf-8'>
+    <script src='http://constellation.github.com/slides/slides.js'></script>
+    <style>
+    h2 a {
+      color: black !important;
+    }
+    h2 a:hover {
+      color: #999 !important;
+    }
+    .bordered_icon {
+      width: 64px;
+      height: 64px;
+      padding: 2px;
+      border: 1px solid #DDD;
+    }
+    .profile_icon {
+      width: 32px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid #DDD;
+      margin-right: 5px;
+      line-height: 1.4;
+    }
+    .profile_text {
+      vertical-align: top;
+    }
+    </style>
+    <link rel="shortcut icon" href="http://25.media.tumblr.com/avatar_fccdd5b6c51d_16.png" />
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-regular template-io-2011'>
+      <article>
+        <h1>Implementation<br>and<br>Future of Taberareloo</h1>
+        <p>
+          <del>id:Constellation</del> Constなんとか
+          <br>
+          Yusuke Suzuki
+          <br>
+          <br>
+          Dec 17, 2011 @ <a href="http://tumblr-developers-meetup-jp.tumblr.com/">tumblr developer's meetup jp 2011</a>
+        </p>
+      </article>
+
+      <article>
+        <h3>自己紹介</h3>
+        <ul>
+        <li>id:Constellation
+        <li><img src="https://secure.gravatar.com/avatar/09b5a917b6ea8928e0d5bf8a432412fe?s=140&d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" alt="Constellation" class="bordered_icon"/>
+        <li>ECMAScripter / JavaScripter
+        <li>Taberareloo
+        <li>ECMA262 仕様厨
+        <li>最近はECMA262処理系書いたり
+        <li>型解析したり
+        <li>回復機能付きparser書いたり
+        <li>esprima parser projectにcontributeしたり
+        </ul>
+      </article>
+
+      <article>
+        <h3>自己紹介</h3>
+        <ul class="build">
+          <li>Q&amp;A
+          <li>「なぜfacebookは対応していないの?」
+        </ul>
+      </article>
+
+      <article>
+        <h2><a href="https://github.com/Constellation/taberareloo">Taberareloo</a></h2>
+      </article>
+
+      <article>
+        <h3>Taberarelooは多くの開発者の協力で成り立っています(敬称略)</h3>
+        <ul>
+          <li><img src="https://secure.gravatar.com/avatar/09b5a917b6ea8928e0d5bf8a432412fe?s=140&d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" alt="Constellation" class="profile_icon"/><span class="profile_text">Constellation</span>
+          <li><img src="http://www.hatena.ne.jp/users/os/os0x/profile.gif" class="profile_icon"/><span class="profile_text">os0x</span>
+          <li><img src="https://secure.gravatar.com/avatar/d5f8d33015c55b9f42465657fad3fecd?s=140&d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" class="profile_icon"/><span class="profile_text">YungSang</span>
+          <li><img src="https://secure.gravatar.com/avatar/cc696ce673253d3bd21b3aa9e7927f39?s=140&d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" class="profile_icon"/><span class="profile_text">hitode909</span>
+          <li><img src="https://secure.gravatar.com/avatar/ed2e333c4a87955254ff3127c25a1284?s=140&d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" class="profile_icon"/><span class="profile_text">syoichi</span>
+          <li><span class="profile_text">Tombloo Dev Team</span>
+        </ul>
+        <p>特にYungSangさんにはGoogle+用Model/Extractorの実装等大変お世話になっております</p>
+        <p>皆さん本当にありがとうございます</p>
+      </article>
+
+      <article>
+        <h3>Taberarelooついて</h3>
+        <ul>
+          <li><img src="https://github.com/Constellation/taberareloo/raw/master/src/skin/fork64.png" alt="Taberareloo icon" class="bordered_icon"/>
+          <li>Yet Another Tombloo on Chromium Tombloo
+          <li><img src="https://lh4.googleusercontent.com/Ue00Vj0E39hreR3UKdmKGXlc-OZyFe7XNtQIFmpg3g_cCZVezRCMseQ_2jCYMsguNEdS95Am1Q=s640-h400-e365" alt="Taberareloo screenshot" />
+        </ul>
+      </article>
+
+      <article>
+        <h3>Taberarelooついて2</h3>
+        <ul class="build">
+          <li>kuさんのtableau
+          <ul><li><a href="http://ido.nu/kuma/2009/09/16/chromium-for-tableau/">TomblooのないChromeで自分をちょっとGoogle化する chromium for tableau</a></li></ul>
+          <li>「たべるー」って読むと思っていた
+          <li>じゃあ自分は「たべられるー」で
+          <li>紅白のあのキャラが思い浮かんだりも
+          <li>モンスターの壺に入れて持って行きましたよね!
+        </ul>
+      </article>
+
+      <article>
+        <h2>patch</h2>
+      </article>
+
+      <article>
+        <h3>Tombloo, Taberarelooの大枠の仕組み</h3>
+        <ul>
+          <li>Extractorがpageから情報を抽出する
+          <li>この情報に付加情報をつける(タグとか, コメントとか)
+          <li>Modelがこの情報をそれぞれのServiceに投げる
+        </ul>
+      </article>
+
+      <article>
+        <h3>例えば</h3>
+        <ul class="build">
+          <li>なにかService(例えばfacebook)へPostしたいと思ったら
+          <li>facebookのModelを作り, Modelsに登録
+          <li>Modelは一定の規約に沿って作る
+          <ul><li><section>
+        <pre>Models.register({
+  NAME: "あずにゃん...",
+  ICON: "...",
+  check: function() { ... },
+  post: function() { ... }
+})</pre></section></ul>
+          <li><strong>するとpost先に選べるようになる</strong>
+        </ul>
+      </article>
+
+      <article>
+        <h3>で, ここから</h3>
+        <ul class="build">
+          <li>Google Chromeはpageごとにcontextが独立している
+          <li>拡張の永続的instanceであるbackgroundがある
+          <li>それとの通信は, Message passingになる. よってJSONで渡せるもの
+        </ul>
+      </article>
+
+      <article>
+        <h3>実装</h3>
+        <ul class="build">
+        <li>なのでpageの情報を使いながら情報を抽出するExtractorは, pageのcontextに
+        <ul><li>でないとpageの情報見れない</li></ul>
+        <li>Modelはbackgroundのcontextにある
+        <li>この間を抽出情報を非同期でpassingしあいながらうまくやり取りする
+        </ul>
+      </article>
+
+      <article>
+        <h3>問題点</h3>
+        <p>contextが分かれている!!</p>
+      </article>
+
+      <article>
+        <h3>問題点2</h3>
+        <ul class="build">
+          <li>拡張性として非常に難しい
+          <li>Tomblooのpatchのsystemを導入できない
+          <li>やるとすれば, context, background別々にpatchを入れないといけない
+        </ul>
+      </article>
+
+      <article>
+        <h3>いくつか検討</h3>
+        <p>という訳でずっと考えているのですが, 何かいい案ないでしょうか?</p>
+        <ul class="build">
+          <li>疎結合Model
+          <li>多態patch
+        </ul>
+      </article>
+
+      <article>
+        <h3>疎結合Model</h3>
+        <p>Abst: より疎結合に</p>
+        <ul class="build">
+          <li>今, postとかextractとかは全て非同期だが, checkは同期
+          <ul>
+            <li>checkとは, 今Modelが有効かどうかを調べるmethod
+          </ul>
+          <li>何もかも非同期にする
+          <li>すると外部拡張との通信を含むModel(Model実体が外部拡張に存在する)が作れそう... (Blobとかは今は考慮せず)
+          <li><a href="http://utatane-constellation.tumblr.com/post/507779801">Google Chromeの拡張関連系の話</a>
+        </ul>
+      </article>
+
+      <article>
+        <h3>疎結合Model2</h3>
+        <p>問題として, Modelしかできない</p>
+        <p>page contextの情報(例えばHTMLElement)が必要なExtractorは無理</p>
+        <p>うーん, 片手落ちか...</p>
+      </article>
+
+      <article>
+        <h3>多態patch</h3>
+        <p>Abst: 1つのpatchを2つのcontextで</p>
+        <ul class="build">
+          <li>1つのpatchを両方のcontextで動かす
+          <li>たとえば...
+        </ul>
+      </article>
+
+      <article>
+        <h3>多態patch2</h3>
+        <section>
+        <pre>Patch.register({
+  background: function() {
+    // background contextでのみ呼び出される
+  },
+  page: function() {
+    // page contextでのみ呼び出される
+  }
+})</pre>
+        </section>
+        <ul>
+          <li>とか...
+          <li>こういうpatchを書いてもらい, 両方のcontextで動かせば
+          <li>うーん...
+        </ul>
+      </article>
+
+      <article>
+        <h2>API based Implementation</h2>
+      </article>
+
+      <article>
+        <h3>きっかけ</h3>
+        <p>DelicousがあんまりにもUI変えまくるので...</p>
+      </article>
+
+      <article>
+        <h3>API based Implementation</h3>
+        <p>とは</p>
+        <ul class="build">
+          <li>ごく普通にAPI tokenをTaberarelooに登録
+          <li>提供されているAPIを通してのpost
+          <li>高い安定性
+          <li>セッション切れなし
+        </ul>
+      </article>
+
+      <article>
+        <h3>えっ</h3>
+        <p>なんで今までやってないの?</p>
+        <ul class="build">
+          <li>API token登録するとか利用者的に面倒...
+          <li>browserがloginしてたらそのまま使いたい
+          <li>APIからでは取得できない情報やpostできない情報があったり
+          <li>ならformからpostで...
+        </ul>
+      </article>
+
+      <article>
+        <h3>そこで</h3>
+        <ul class="build">
+          <li>optionalとしてtokenを登録できるようにしてはどうか
+          <li>完全にAPIのみでやりたいことがまかなえるServiceに限る
+          <li>tokenが登録されていればそちらを使って安定post
+          <li>なければ従来挙動
+          <li>というのを検討しているのですが
+          <li>どうでしょうか?
+        </ul>
+      </article>
+
+      <article>
+        <h2>Future</h2>
+      </article>
+
+      <article>
+        <h3>ChromeのAPI</h3>
+        <p>Google Chrome extensionのAPIはまだまだ拡張が続いています(以下experimentalばかりなので, 今は使えません. 将来)</p>
+        <ul>
+          <li>つい最近<a href="http://code.google.com/chrome/extensions/trunk/experimental.socket.html">普通のsocket API</a>がexperimentalに入りました
+          <li><a href="http://code.google.com/chrome/extensions/experimental.settings.html">settings API</a>とかも
+          <li><a href="http://code.google.com/chrome/extensions/trunk/webRequest.html">webRequest API</a>はredirect検知や, <strong>referer書き換え</strong>などが
+          <li><a href="http://code.google.com/chrome/extensions/trunk/experimental.storage.html">storage API</a>はChromeのsyncで同期される脅威のstorage...
+        </ul>
+        <p>楽しみですね...</p>
+      </article>
+
+      <article>
+        <h3>終わりに</h3>
+        <ul>
+          <li>Taberarelooではissue, patch, pull requestなんでもお待ちしております
+          <li><a href="https://github.com/Constellation/taberareloo/issues">issueなどはこちらへ</a>
+          <li>あとでYouTubeのExtractorが壊れているの直します...
+        </ul>
+      </article>
+
+      <article>
+        <h3>ありがとうございました</h3>
+        <p><a href='http://d.hatena.ne.jp/Constellation/'>id:Constellation</a></p>
+      </article>
+    </section>
+  </body>
+</html>

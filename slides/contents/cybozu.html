@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahe (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>iv / lv5, az slide</title>
+    <meta charset='utf-8'>
+    <script src='http://constellation.github.com/slides/slides.js'></script>
+    <style>
+    h2 a {
+      color: black !important;
+    }
+    h2 a:hover {
+      color: #999 !important;
+    }
+    </style>
+    <link rel="shortcut icon" href="http://25.media.tumblr.com/avatar_fccdd5b6c51d_16.png" />
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-regular template-io-2011'>
+      <article>
+        <h1>Implement the most precise ECMA262 Engine<br></h1>
+        <p>
+          <del>id:Constellation</del> Constなんとか
+          <br>
+          Yusuke Suzuki
+          <br>
+          <br>
+          Aug 18, 2011
+        </p>
+      </article>
+
+      <article>
+        <h3>自己紹介</h3>
+        <ul>
+        <li>id:Constellation</li>
+        <li>ECMAScripter / JavaScripter</li>
+        <li>Google Chrome拡張など(Taberareloo)</li>
+        <li>ECMA262 仕様厨</li>
+        </ul>
+      </article>
+
+      <article>
+        <h2><a href="https://github.com/Constellation/iv">iv / lv5 : ECMA262 Engine</a></h2>
+      </article>
+
+      <article>
+        <h3>iv及びlv5について</h3>
+        <ul>
+          <li>
+            ECMAScriptのparser / lexer libraryとしてのiv
+          </li>
+          <li>
+            それを利用したECMAScript Engineとしてのlv5
+          </li>
+          <li>
+            だってparser / lexer書いたらengine書きたくなっちゃうじゃないですか...
+          </li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          ECMA262 5.1th engine : iv / lv5
+        </h3>
+        <ul>
+          <li>
+            いわゆるECMAScript
+          </li>
+          <li><ul>
+            <li>いわゆる(その2), JavaScript</li>
+          </ul></li>
+          <li>
+            仕様準拠
+          </li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          ECMA262 specificationに対して正確なengine
+        </h3>
+        <ul class="build">
+          <li>
+            既存のengineも作り始めた当時と比較すればかなり正確になりましたが
+          </li>
+          <li>
+            sputniktests, SpiderMonkeyでfail数120件程度
+          </li>
+          <li>
+            iv / lv5で77件
+          </li>
+          <li><ul>
+            <li>
+             以前より増えたのは, ES5自体の変更への対応でsputniktestsがfailしたのが増えたので...
+            </li>
+            <li>
+             ECMA262 5.1thの仕様準拠度自体は向上し続けています
+            </li>
+            <li>
+             最新のES5 Conformance Suiteもtest自体が間違っているの以外はすべてpass
+            </li>
+          </ul></li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>最近</h3>
+        <ul class="build">
+          <li>前はASTをそのまま実行するInterpreterでした</li>
+          <li>
+            <p>「JavaScriptのEngineを書いていらっしゃる」というように言われたときに</p>
+            <p>「まあECMAScriptのAST Interpreterなんですけどね」</p>
+            <p>心苦しいのと, なんか悔しい</p>
+          </li>
+          <li>
+            <p>で, VMに</p>
+            <p>これで心置きなくEngineと名乗れますね!!!</p>
+          </li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>VM化</h3>
+        <ul class="build">
+        <li>
+          <p>The Lv6 Shift Project</p>
+          <p>VM化, 高速化branch(accelerator...)</p>
+        </li>
+        <li>
+          <p>stack VM</p>
+          <p>Interpreterと共存</p>
+          <p>--interp optionで同じScriptがInterpreterで</p>
+        </li>
+        </ul>
+      </article>
+
+      <article>
+        <ul class="build">
+          <li>src codeと名前</li>
+          <li>VM: railgun</li>
+          <li>Interpreter: teleporter</li>
+          <li>
+          <p>由来はお察しください</p>
+          </li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>高速化</h3>
+        <ul>
+          <li>変数のstack割付</li>
+          <li>不要な抽象化のbytecode化による削除</li>
+          <li>非参照変数の削除</li>
+          <li>不要な環境hash tableは作らない</li>
+          <li>Heap変数のoffsetによる事前lookup</li>
+          <li>dead code elimination</li>
+          <li>GlobalObjectに対するproperty lookupのinline cache</li>
+          <li>Stringのrope表現</li>
+          <li>Symbolの表現の改善(64bit index畳み込み)</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>評価</h3>
+        <p>SunSpiderを走らせることができるのですが,</p>
+        <p>77000msから6200msへ</p>
+        <p>11倍ちかく高速</p>
+      </article>
+
+      <article>
+        <h3>今後</h3>
+        <ul>
+          <li>RegisterVMについて検討</li>
+          <li>GCの自作検討(今boehmGC)</li>
+          <li>object全般に対するPolymorphic Inline Cache</li>
+          <li>option次第でJIT(Interpreterと共存できたので何とかなりそう)</li>
+        </ul>
+      </article>
+
+      <article class='smaller'>
+        <q>
+          ユースの方でやらせていただいていることは明日に完成しているかどうか怪しいのですが... 15分近くの時間のうち, 完成度に応じて, そちらの方を話す割合が増えます.(逆に完成が近づいていないと, lv5の話が増えます)
+        </q>
+        <div class='author'>
+          id:Constellation
+        </div>
+      </article>
+
+      <article>
+        <br>
+        <p>思いの外完成したのでそちらの話をします</p>
+      </article>
+
+      <article>
+        <h2>
+          <a href="https://github.com/Constellation/az">az : ECMAScript Analyzer</a>
+        </h2>
+      </article>
+
+      <article>
+        <h3>
+          静的解析がしたい!
+        </h3>
+        <ul>
+          <li>
+            折角lexerもparserもあるのだから
+          </li>
+          <li>
+            静的解析、しましょうか
+          </li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>というか補完がしたい</h3>
+        <ul>
+          <li>Vim使いなのですが</li>
+          <li>WebStormなどJavaScript用IDEの構造を読み取る優れた補完の数々, 正直羨ましい...</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          一筋の光が...
+        </h3>
+        <ul class="build">
+          <li>clangのcompletion機能</li>
+          <li>
+            <p>clangはCLIからpositionを渡すことで補完候補をSTDOUTに列挙することができる</p>
+            <p>それをつかったVim/Emacsの補完用pluginなども</p>
+            <p><a href='http://d.hatena.ne.jp/osyo-manga/20110210/1297328933'>clang_complete</a></p>
+          </li>
+          <li>CLIからソースとpositionを受け取って補完候補を返すtoolを作れば, Vimで補完!</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>問題点</h3>
+        <ul class="build">
+          <li>clangの場合は補完部分以前にすべての情報が存在しているので, そこまで解析すればいい</li>
+          <li>
+            <p>C++なら前方宣言があるので</p>
+            <p><a href='http://steps.dodgson.org/?date=20110426'>Clangのコード補完</a> omoさんによる解説</p>
+          </li>
+          <li>しかしJSはFunctionDeclarationなどを後ろに書いても大丈夫</li>
+          <li>補完対象のJSって当然Syntaxぶっ壊れていますけど...</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          型の推論 : Doctorjs
+        </h3>
+        <ul class="build">
+          <li>
+            <p>Doctorjsというものが</p>
+            <p>CFA2
+            <p>AbstractInterpreterを使い, 型情報を集める</p>
+          </li>
+          <li>
+            <p>az/cfa2 directory</p>
+            <p>型の情報を集める部分はこのsrcをもとにC++で作成したので, az/cfa2以下はLicenseがMPLです(README.mkd参考)</p>
+          </li>
+          <li>ただしASTを要求するので, Syntaxが正しいものしか解析できない</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>要は</h3>
+        <section>
+        <pre>var target = new Target();
+target.// [ここで補完!!]
+
+// なんか後ろに実態の宣言(FunctionDeclaration)が...
+function Target() {
+  this.value = "OK";
+}
+
+Target.prototype.getValue = function getValue() {
+  return this.value;
+}</pre>
+        </section>
+        <ul>
+          <li>とかどうしますの... という話</li>
+          <li>型の解析だって後ろのgetValueとか見ないとダメだから, 打ち切るというわけにもいかない</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>方針 : Syntax InvalidなASTに対して解析を行う</h3>
+        <ul class="build">
+          <li>
+            <p>まずRecovery機能つきParserを作成(同期tokenによる単純な方式)</p>
+            <p>Syntaxが不正なScriptからでも常にASTを得る</p>
+          </li>
+          <li>Parser時点でCompletionPointを挿入し, どのExpressionに対してCompletionを行うのかというのを取得しておく</li>
+          <li>Doctorjsのalgorithmを使ってScriptの型を推論する</li>
+          <li>CompletionPointのExpressionの含まれるFunctionについて再解析し, Completion候補をCompleterに通知する</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Demo</h3>
+        <section>
+        <pre>var container = {
+  init: function() {},
+};
+container.obj = (function(){
+  var privateProp = null;
+  var namager = {
+    publicMethod: function(){ },
+  };
+  return namager;
+})();</pre>
+        </section>
+        <ul>
+          <li><a href='http://d.hatena.ne.jp/teramako/20090205/p1'>Komodo Edit が面白い</a></li>
+          <li><a href='http://efcl.info/2011/0622/res2907/'>JavaScriptエディタとしてのTitanium Studio</a></li>
+        </ul>
+      </article>
+
+      <article>
+        <h4>問題点</h4>
+        <ul>
+          <li>AbstractInterpreterは状態が有限でなければいけない(終了しない...)</li>
+          <li>あくまでsource code上からlexicalに判定できるものまでしかわからない</li>
+          <li>jQueryとかから補完候補を出すことはできない</li>
+        </ul>
+      </article>
+
+      <article>
+        <h4>解決策(将来の課題)</h4>
+        <ul>
+          <li>WebStormなど, 予めJSDocで書いた型情報のtemplateを読み込んでおき, これを基準に解析</li>
+          <li>これなら, 自分できちんと用意しておけば大丈夫</li>
+          <li>Closure Compilerのsource codeのcontribにそういったtemplateなども(externs)</li>
+          <li>JSDocの解析機構を搭載し, そこからわかる型情報を含める</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>ありがとうございました</h3>
+        <p><a href='http://d.hatena.ne.jp/Constellation/'>id:Constellation</a></p>
+      </article>
+    </section>
+  </body>
+</html>
