@@ -5,7 +5,7 @@
 	<title>JS code generator demo: JS → AST → JS</title>
   <link rel="stylesheet" href="http://constellation.github.com/iv/js/ivjs.css" type="text/css" />
   <script src='esprima.js'></script>
-  <script src='striker.js'></script>
+  <script src='escodegen.js'></script>
   <script type="text/javascript">
 function $D(elm) {
   var range = document.createRange();
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function(ev) {
     try {
       removeClass(textarea, "invalid");
       var AST = esprima.parse(textarea.value);
-      pre.appendChild($T(striker.generate(AST)));
+      pre.appendChild($T(escodegen.generate(AST)));
     } catch (e) {
       addClass(textarea, "invalid")
       pre.appendChild($T("Invalid"));
