@@ -59,9 +59,7 @@ parseStatement: true, parseSourceElement: true */
         labelSet,
         inIteration,
         inSwitch,
-        inFunctionBody,
-        pendingComments,
-        pendingNode;
+        inFunctionBody;
 
     Token = {
         BooleanLiteral: 1,
@@ -3085,8 +3083,6 @@ parseStatement: true, parseSourceElement: true */
     // the comments is active.
 
     function addComment(start, end, type, value) {
-        var comment;
-
         if (typeof start !== 'number') {
             return;
         }
@@ -3101,17 +3097,11 @@ parseStatement: true, parseSourceElement: true */
             }
         }
 
-        comment = {
+        extra.comments.push({
             range: [start, end],
             type: type,
             value: value
-        };
-
-        extra.comments.push(comment);
-
-        if (pendingComments) {
-            pendingComments.push(comment);
-        }
+        });
     }
 
     function scanComment() {
@@ -3259,7 +3249,7 @@ parseStatement: true, parseSourceElement: true */
         };
     }
 
-    function wrapTrackingFunction(range, loc, owningComments) {
+    function wrapTrackingFunction(range, loc) {
 
         return function (parseFunction) {
 
@@ -3301,7 +3291,7 @@ parseStatement: true, parseSourceElement: true */
             }
 
             return function () {
-                var node, rangeInfo, locInfo, i, len, comment;
+                var node, rangeInfo, locInfo;
 
                 skipComment();
                 rangeInfo = [index, 0];
@@ -3340,31 +3330,6 @@ parseStatement: true, parseSourceElement: true */
                             node.loc.start = node.object.loc.start;
                         }
                     }
-
-                    // attach comments
-                    if (owningComments) {
-                        while (pendingComments.length) {
-                            comment = pendingComments[pendingComments.length - 1];
-                            if (comment.range[1] <= node.range[0]) {
-                                if (node.type === Syntax.Program && pendingNode) {
-                                    pendingComments.pop();
-                                    pendingNode.leadingComment = comment;
-                                    pendingNode = null;
-                                } else {
-                                    pendingNode = node;
-                                    break;
-                                }
-                            } else {
-                                pendingComments.pop();
-                                if (pendingNode) {
-                                    pendingNode.leadingComment = comment;
-                                    pendingNode = null;
-                                } else {
-                                    node.trailingComment = comment;
-                                }
-                            }
-                        }
-                    }
                     return node;
                 }
             };
@@ -3386,9 +3351,9 @@ parseStatement: true, parseSourceElement: true */
             createLiteral = createRawLiteral;
         }
 
-        if (extra.range || extra.loc || extra.owningComments) {
+        if (extra.range || extra.loc) {
 
-            wrapTracking = wrapTrackingFunction(extra.range, extra.loc, extra.owningComments);
+            wrapTracking = wrapTrackingFunction(extra.range, extra.loc);
 
             extra.parseAdditiveExpression = parseAdditiveExpression;
             extra.parseAssignmentExpression = parseAssignmentExpression;
@@ -3483,7 +3448,7 @@ parseStatement: true, parseSourceElement: true */
             createLiteral = extra.createLiteral;
         }
 
-        if (extra.range || extra.loc || extra.owningComments) {
+        if (extra.range || extra.loc) {
             parseAdditiveExpression = extra.parseAdditiveExpression;
             parseAssignmentExpression = extra.parseAssignmentExpression;
             parseBitwiseANDExpression = extra.parseBitwiseANDExpression;
@@ -3558,18 +3523,9 @@ parseStatement: true, parseSourceElement: true */
         inIteration = false;
         lastParenthesized = null;
         inFunctionBody = false;
-        pendingComments = null;
-        pendingNode = null;
 
         extra = {};
         if (typeof options !== 'undefined') {
-            extra.owningComments = (typeof options.owningComments === 'boolean') && options.owningComments;
-            if (extra.owningComments) {
-                // force comment and range to true
-                options.range = true;
-                options.comment = true;
-                pendingComments = [];
-            }
             extra.range = (typeof options.range === 'boolean') && options.range;
             extra.loc = (typeof options.loc === 'boolean') && options.loc;
             extra.raw = (typeof options.raw === 'boolean') && options.raw;
