@@ -35,7 +35,7 @@ contribution
         - https://bugs.ecmascript.org/show_bug.cgi?id=215
         - https://bugs.ecmascript.org/show_bug.cgi?id=218
         - https://bugs.ecmascript.org/show_bug.cgi?id=270
-        - https://bugs.ecmascript.org/show_bug.cgi?id=288
+        - https://bugs.ecmascript.org/show_bug.cgi?id=271
         - https://bugs.ecmascript.org/show_bug.cgi?id=287
         - https://bugs.ecmascript.org/show_bug.cgi?id=294
 
