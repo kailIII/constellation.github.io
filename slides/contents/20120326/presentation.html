@@ -2512,7 +2512,7 @@ RHSにregisterに対して副作用を起こすものがあるときには, 値�
 
 <p>が</p>
 <div class="highlight"><pre><span class="lineno">1</span> <span class="n">LOAD_INT32</span> <span class="n">r0</span> <span class="mi">10</span>  <span class="c1">// var a = 10;</span>
-<span class="lineno">2</span> <span class="n">LOAD_INT32</span> <span class="n">r1</span> <span class="mi">10</span>  <span class="c1">// var b = 30;</span>
+<span class="lineno">2</span> <span class="n">LOAD_INT32</span> <span class="n">r1</span> <span class="mi">30</span>  <span class="c1">// var b = 30;</span>
 <span class="lineno">3</span> 
 <span class="lineno">4</span>                   <span class="c1">// map[r1]にr1をつないでおく.</span>
 <span class="lineno">5</span> <span class="n">LOAD_INT32</span> <span class="n">r0</span> <span class="mi">20</span>  <span class="c1">// r1には影響なし</span>
@@ -2679,7 +2679,7 @@ RHSにregisterに対して副作用を起こすものがあるときには, 値�
 <li>非常に参考になりました</li>
 </ul>
 </li>
-<li>(根幹) BackTrackをstackに積んで, matchにfailしたら, stackから下ろしてresumeする</li>
+<li>(根幹) BackTrackのためのcontextをstackに積んで, matchにfailしたら, stackから下ろしてresumeする</li>
 <li>大した最適化していないです......</li>
 </ul></section>
             
