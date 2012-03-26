@@ -525,7 +525,7 @@ lv5の実装. コンビニにラムレーズンアイスを買いに行った時
 
     !cpp
     LOAD_INT32 r0 10  // var a = 10;
-    LOAD_INT32 r1 10  // var b = 30;
+    LOAD_INT32 r1 30  // var b = 30;
 
                       // map[r1]にr1をつないでおく.
     LOAD_INT32 r0 20  // r1には影響なし
@@ -595,7 +595,7 @@ AeroHand RegExp Runtime
 - [RE1](http://code.google.com/p/re1/)
     - Russ CoxさんのVMによる正規表現の実装, RE1
     - 非常に参考になりました
-- (根幹) BackTrackをstackに積んで, matchにfailしたら, stackから下ろしてresumeする
+- (根幹) BackTrackのためのcontextをstackに積んで, matchにfailしたら, stackから下ろしてresumeする
 - 大した最適化していないです......
 
 ----
