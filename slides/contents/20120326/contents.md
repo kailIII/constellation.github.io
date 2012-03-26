@@ -149,13 +149,18 @@ instruction2
             }
             test();    // RangeError: maximum call stack size exceeded
 
+
+----
+
+instruction3
+============
+
 - registerの指定はint16\_t
     - 負数のregister番地を指す場合がある
         - arguments. 後述
 - RegisterVMのstackの最大サイズはこちらが把握しているので, int16\_tに意図的にすることで, union中に効率よく格納
 
 ----
-
 
 code
 ====
