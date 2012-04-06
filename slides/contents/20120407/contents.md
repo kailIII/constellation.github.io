@@ -122,6 +122,9 @@ Semantics
 - Map / Setにおけるequalityの基盤
 - Strict Equality Algorithm(=== / !==)と異なる
     - CoffeeScriptやばい...
+- 実は昔からあるSameValue algorithmがuserlandで見えるようになったもの
+    - SameValue algorithmはproperty代入の同一性検査とかに使われていました
+    - writableがfalseでSameValueじゃなければrejectとか
 
 ---
 
