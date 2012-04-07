@@ -1781,20 +1781,20 @@ $(window).load(function () {
 <li>これもuninitializedな状態を持たないため</li>
 <li>
 <p>staticに解析可能</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="p">{</span>
-<span class="lineno">2</span>   <span class="kr">const</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
-<span class="lineno">3</span> <span class="p">}</span>
-<span class="lineno">4</span> <span class="nx">console</span><span class="p">.</span><span class="nx">assert</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">V</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span><span class="p">);</span>
+<div class="highlight"><pre><span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">assert</span><span class="p">(</span><span class="k">typeof</span> <span class="nx">V</span> <span class="o">===</span> <span class="s1">&#39;undefined&#39;</span><span class="p">);</span>
 </pre></div>
 
 </li>
 <li>
 <p>もしもblock scopedでなければ,</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="k">if</span> <span class="p">(</span><span class="nx">cond</span><span class="p">)</span> <span class="p">{</span>
-<span class="lineno">2</span>   <span class="kr">const</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
-<span class="lineno">3</span> <span class="p">}</span>
-<span class="lineno">4</span> <span class="c1">// ここでVがuninitializedか, initializedかどうかは</span>
-<span class="lineno">5</span> <span class="c1">// runtimeにしかわからない</span>
+<div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nx">cond</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kr">const</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">// ここでVがuninitializedか, initializedかどうかは</span>
+<span class="c1">// runtimeにしかわからない</span>
 </pre></div>
 
 </li>
@@ -1841,8 +1841,8 @@ $(window).load(function () {
 <ul>
 <li>
 <p>つまりですね,</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="kr">const</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
-<span class="lineno">2</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>  <span class="c1">// これがSyntaxErrorになる!</span>
+<div class="highlight"><pre><span class="kr">const</span> <span class="nx">V</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<span class="nx">V</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>  <span class="c1">// これがSyntaxErrorになる!</span>
 </pre></div>
 
 </li>
@@ -1910,8 +1910,8 @@ $(window).load(function () {
             <section><ul>
 <li>
 <p><a href="http://wiki.ecmascript.org/doku.php?id=harmony:egal">egal operator</a></p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="nx">i</span> <span class="nx">is</span> <span class="nx">j</span><span class="p">;</span>
-<span class="lineno">2</span> <span class="nx">k</span> <span class="nx">isnt</span> <span class="nx">l</span><span class="p">;</span>
+<div class="highlight"><pre><span class="nx">i</span> <span class="nx">is</span> <span class="nx">j</span><span class="p">;</span>
+<span class="nx">k</span> <span class="nx">isnt</span> <span class="nx">l</span><span class="p">;</span>
 </pre></div>
 
 </li>
@@ -2004,8 +2004,8 @@ $(window).load(function () {
 <li>つまり, keywordではなく, 文脈依存でkeywordのような扱われ方をするということ</li>
 <li>
 <p>例えば, is / isntはcontextual keywordなので</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="kd">var</span> <span class="kd">function</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>  <span class="c1">// これはkeywordなのでだめだけど</span>
-<span class="lineno">2</span> <span class="kd">var</span> <span class="nx">is</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>  <span class="c1">// これはOK</span>
+<div class="highlight"><pre><span class="kd">var</span> <span class="kd">function</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>  <span class="c1">// これはkeywordなのでだめだけど</span>
+<span class="kd">var</span> <span class="nx">is</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>  <span class="c1">// これはOK</span>
 </pre></div>
 
 </li>
@@ -2073,9 +2073,9 @@ $(window).load(function () {
             <section><ul>
 <li>
 <p>これです</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="kd">var</span> <span class="nx">DerivedArray</span> <span class="o">=</span> <span class="nb">Array</span> <span class="o">&lt;|</span> <span class="kd">function</span> <span class="nx">DerivedArray</span><span class="p">()</span> <span class="p">{</span>
-<span class="lineno">2</span>   <span class="k">return</span> <span class="nx">DerivedArray</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">&lt;|</span> <span class="p">[];</span>
-<span class="lineno">3</span> <span class="p">};</span>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">DerivedArray</span> <span class="o">=</span> <span class="nb">Array</span> <span class="o">&lt;|</span> <span class="kd">function</span> <span class="nx">DerivedArray</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="nx">DerivedArray</span><span class="p">.</span><span class="nx">prototype</span> <span class="o">&lt;|</span> <span class="p">[];</span>
+<span class="p">};</span>
 </pre></div>
 
 </li>
@@ -2161,8 +2161,8 @@ $(window).load(function () {
             <section><ul>
 <li>
 <p>継承</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="kd">var</span> <span class="nx">Derived</span> <span class="o">=</span> <span class="nx">Base</span> <span class="o">&lt;|</span> <span class="kd">function</span> <span class="nx">Derived</span><span class="p">()</span> <span class="p">{</span>
-<span class="lineno">2</span> <span class="p">};</span>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Derived</span> <span class="o">=</span> <span class="nx">Base</span> <span class="o">&lt;|</span> <span class="kd">function</span> <span class="nx">Derived</span><span class="p">()</span> <span class="p">{</span>
+<span class="p">};</span>
 </pre></div>
 
 </li>
@@ -2365,7 +2365,7 @@ function test(a) {
 <li>LHSについて改訂</li>
 <li>
 <p>LHSがPrimaryExpression : ( Expression ) についてLeftHandSideExpressionじゃなくなるとout</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<div class="highlight"><pre><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
 </pre></div>
 
 </li>
@@ -2406,7 +2406,7 @@ function test(a) {
 <li>ES.next draftのbug</li>
 <li>
 <p>destructuring-assignmentはAssignmentBindingPatternについては以下の文法を認めている</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="p">({</span> <span class="nx">responseText</span> <span class="p">})</span> <span class="o">=</span> <span class="nx">res</span><span class="p">;</span>
+<div class="highlight"><pre><span class="p">({</span> <span class="nx">responseText</span> <span class="p">})</span> <span class="o">=</span> <span class="nx">res</span><span class="p">;</span>
 </pre></div>
 
 </li>
@@ -2454,8 +2454,8 @@ function test(a) {
 <li>ひっそりと消えました</li>
 <li>
 <p>in ES5, following script is valid</p>
-<div class="highlight"><pre><span class="lineno">1</span> <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">20</span> <span class="k">in</span> <span class="p">[])</span> <span class="p">{</span>
-<span class="lineno">2</span> <span class="p">}</span>
+<div class="highlight"><pre><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">20</span> <span class="k">in</span> <span class="p">[])</span> <span class="p">{</span>
+<span class="p">}</span>
 </pre></div>
 
 </li>
