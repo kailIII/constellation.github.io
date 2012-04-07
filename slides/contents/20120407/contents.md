@@ -7,7 +7,7 @@ ES.next the corner cases
 主題
 ====
 
-- おそらく, 皆さんがES.nextの主要機能についてしゃべり尽くしていると思うので
+- おそらくけっこうみなさんES.nextの主要機能については知ってらっしゃるのではないかと.
 - 誰も喋っていないのではないかなーと思われる, corner casesについて
 - parserどうぞ
     - [ES.next parser](http://constellation.github.com/iv/js/es.next.html)
