@@ -2123,6 +2123,8 @@ $(window).load(function () {
 <li>なんでLiteralしか来れない?<ul>
 <li>おそらく, 静的に確定させたいから</li>
 <li>[[Prototype]]が書き換わると, MapのTransitが起き, inline cacheが破滅するので, あんまり途中で変えたくない</li>
+<li>また, <strong>proto</strong>の書き換えはあまり起こることが予想されないので, transition tableに登録されていないであろう</li>
+<li>到達不可能なuniqueなMapが作成され, inline cacheがhitせず, 効率的でない</li>
 </ul>
 </li>
 <li>ただし, 左辺のObjectがprototype propertyを持ち, 右辺にfunctionが来た場合は挙動が異なる</li>

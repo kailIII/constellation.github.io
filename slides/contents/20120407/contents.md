@@ -178,6 +178,8 @@ TriangleLiteral
 - なんでLiteralしか来れない?
     - おそらく, 静的に確定させたいから
     - [[Prototype]]が書き換わると, MapのTransitが起き, inline cacheが破滅するので, あんまり途中で変えたくない
+    - また, __proto__の書き換えはあまり起こることが予想されないので, transition tableに登録されていないであろう
+    - 到達不可能なuniqueなMapが作成され, inline cacheがhitせず, 効率的でない
 - ただし, 左辺のObjectがprototype propertyを持ち, 右辺にfunctionが来た場合は挙動が異なる
 
 ---
