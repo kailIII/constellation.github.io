@@ -9,6 +9,8 @@ ES.next the corner cases
 
 - おそらく, 皆さんがES.nextの主要機能についてしゃべり尽くしていると思うので
 - 誰も喋っていないのではないかなーと思われる, corner casesについて
+- parserどうぞ
+    - [ES.next parser](http://constellation.github.com/iv/js/es.next.html)
 
 
 ---
