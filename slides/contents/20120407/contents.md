@@ -227,7 +227,28 @@ Date with NaN
 
 > If this time value is NaN, the String value is "Invalid Date"
 
+
+- 今まで, NaNなDateがtoStringでどのような値を返すかというのは仕様では決まっていなかった
+- "Invalid Date"をmessageにもつRangeErrorをthrowするなど, 様々
+
 ---
+
+enumeration order
+=================
+
+- strawmanですが
+- [enumeration](http://wiki.ecmascript.org/doku.php?id=strawman:enumeration)
+- propertyのfor-inやObject.keysなどでの登場順が規定された
+- ES5まででは規定されていなかった
+    - test262にこの順番に依存したtestがいくつか存在するので, 今度reportします...
+- 基本的には
+    - indexになる数値ははじめに, 数値順に
+    - その他は追加順に
+- enumerationに書いてある実例としての実装がV8の実装そのままなので面白いです
+
+> all objects have two sequential property tables:
+>   properties with uint32 names, kept in integer order
+>   all other properties, kept in creation order
 
 LHS
 ===

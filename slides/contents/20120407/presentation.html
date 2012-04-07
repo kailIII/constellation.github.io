@@ -2277,7 +2277,11 @@ function test(a) {
 </ul>
 <blockquote>
 <p>If this time value is NaN, the String value is "Invalid Date"</p>
-</blockquote></section>
+</blockquote>
+<ul>
+<li>今まで, NaNなDateがtoStringでどのような値を返すかというのは仕様では決まっていなかった</li>
+<li>"Invalid Date"をmessageにもつRangeErrorをthrowするなど, 様々</li>
+</ul></section>
             
           </div>
           <div class="presenter_notes">
@@ -2304,10 +2308,31 @@ function test(a) {
         <div class="slide has_code">
           <div class="inner">
             
-            <header><h1>LHS</h1></header>
+            <header><h1>enumeration order</h1></header>
             
             
             <section><ul>
+<li>strawmanですが</li>
+<li><a href="http://wiki.ecmascript.org/doku.php?id=strawman:enumeration">enumeration</a></li>
+<li>propertyのfor-inやObject.keysなどでの登場順が規定された</li>
+<li>ES5まででは規定されていなかった<ul>
+<li>test262にこの順番に依存したtestがいくつか存在するので, 今度reportします...</li>
+</ul>
+</li>
+<li>基本的には<ul>
+<li>indexになる数値ははじめに, 数値順に</li>
+<li>その他は追加順に</li>
+</ul>
+</li>
+<li>enumerationに書いてある実例としての実装がV8の実装そのままなので面白いです</li>
+</ul>
+<blockquote>
+<p>all objects have two sequential property tables:
+  properties with uint32 names, kept in integer order
+  all other properties, kept in creation order</p>
+</blockquote>
+<h1>LHS</h1>
+<ul>
 <li>section 11.13</li>
 <li>LHSについて改訂</li>
 <li>
@@ -2586,7 +2611,7 @@ function test(a) {
       
       
       <tr id="toc-row-19">
-        <th><a href="#slide19">LHS</a></th>
+        <th><a href="#slide19">enumeration order</a></th>
         <td><a href="#slide19">19</a></td>
       </tr>
       
