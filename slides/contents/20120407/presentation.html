@@ -1622,7 +1622,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              1/20
+              1/22
             </aside>
           </footer>
         </div>
@@ -1654,7 +1654,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              2/20
+              2/22
             </aside>
           </footer>
         </div>
@@ -1682,7 +1682,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              3/20
+              3/22
             </aside>
           </footer>
         </div>
@@ -1723,7 +1723,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              4/20
+              4/22
             </aside>
           </footer>
         </div>
@@ -1763,7 +1763,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              5/20
+              5/22
             </aside>
           </footer>
         </div>
@@ -1817,7 +1817,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              6/20
+              6/22
             </aside>
           </footer>
         </div>
@@ -1865,7 +1865,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              7/20
+              7/22
             </aside>
           </footer>
         </div>
@@ -1893,7 +1893,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              8/20
+              8/22
             </aside>
           </footer>
         </div>
@@ -1934,7 +1934,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              9/20
+              9/22
             </aside>
           </footer>
         </div>
@@ -1954,12 +1954,12 @@ $(window).load(function () {
 <li>+0 is -0 =&gt; false</li>
 <li>Map / Setにおけるequalityの基盤</li>
 <li>Strict Equality Algorithm(=== / !==)と異なる<ul>
-<li>CoffeeScriptやばい...</li>
+<li>CoffeeScript大敗北...</li>
 </ul>
 </li>
-<li>実は昔からあるSameValue algorithmがuserlandで見えるようになったもの<ul>
+<li>実は昔からあるSameValue algorithmがuser levelで見えるようになったもの<ul>
 <li>SameValue algorithmはproperty代入の同一性検査とかに使われていました</li>
-<li>writableがfalseでSameValueじゃなければrejectとか</li>
+<li>writableがfalseでSameValueじゃなければrejectとかそういう</li>
 </ul>
 </li>
 </ul></section>
@@ -1978,7 +1978,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              10/20
+              10/22
             </aside>
           </footer>
         </div>
@@ -1996,6 +1996,9 @@ $(window).load(function () {
 <li>このis / isntはContextual Keyword</li>
 <li>これにかぎらず, ES.nextではStatement先頭以外のkeywordは大体contextual keyword<ul>
 <li>ofとか</li>
+<li>Statement先頭のものは, 変数名と区別がつかないので, keywordにせざるを得ない</li>
+<li>moduleとかはkeyword</li>
+<li>break the webのよかん...</li>
 </ul>
 </li>
 <li>つまり, keywordではなく, 文脈依存でkeywordのような扱われ方をするということ</li>
@@ -2025,7 +2028,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              11/20
+              11/22
             </aside>
           </footer>
         </div>
@@ -2053,7 +2056,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              12/20
+              12/22
             </aside>
           </footer>
         </div>
@@ -2096,7 +2099,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              13/20
+              13/22
             </aside>
           </footer>
         </div>
@@ -2139,7 +2142,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              14/20
+              14/22
             </aside>
           </footer>
         </div>
@@ -2182,7 +2185,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              15/20
+              15/22
             </aside>
           </footer>
         </div>
@@ -2210,7 +2213,7 @@ $(window).load(function () {
             </aside>
             
             <aside class="page_number">
-              16/20
+              16/22
             </aside>
           </footer>
         </div>
@@ -2252,7 +2255,7 @@ function test(a) {
             </aside>
             
             <aside class="page_number">
-              17/20
+              17/22
             </aside>
           </footer>
         </div>
@@ -2288,7 +2291,106 @@ function test(a) {
             </aside>
             
             <aside class="page_number">
-              18/20
+              18/22
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: contents.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>LHS</h1></header>
+            
+            
+            <section><ul>
+<li>section 11.13</li>
+<li>LHSについて改訂</li>
+<li>
+<p>LHSがPrimaryExpression : ( Expression ) についてLeftHandSideExpressionじゃなくなるとout</p>
+<div class="highlight"><pre><span class="lineno">1</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+</pre></div>
+
+</li>
+<li>
+<p>とかがSyntaxErrorに (ES5でははReferenceError)</p>
+</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="contents.md">contents.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              19/22
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: contents.md -->
+      <div class="slide-wrapper">
+        <div class="slide has_code">
+          <div class="inner">
+            
+            <header><h1>draft bug</h1></header>
+            
+            
+            <section><ul>
+<li>ES.next draftのbug</li>
+<li>destructuring-assignmentについて</li>
+<li>
+<p>destructuring-assignmentはAssignmentBindingPatternについては以下の文法を認めている</p>
+<div class="highlight"><pre><span class="lineno">1</span> <span class="p">({</span> <span class="nx">responseText</span> <span class="p">})</span> <span class="o">=</span> <span class="nx">res</span><span class="p">;</span>
+</pre></div>
+
+</li>
+<li>
+<p>section 11.13 Runtime Semantics</p>
+</li>
+</ul>
+<blockquote>
+<p>If LeftHandSideExpression is neither an ObjectLiteral nor an ArrayLiteral then</p>
+</blockquote>
+<ul>
+<li>destructuring-assignmentは一回ObjectLiteral or ArrayLiteralとしてparseしてみて, その後, 再解釈という形式を取る</li>
+<li>
+<p>なので上記の形式は,</p>
+<div class="highlight"><pre><span class="lineno">1</span> <span class="p">({</span> <span class="nx">responseText</span> <span class="p">})</span>
+</pre></div>
+
+</li>
+<li>
+<p>がObjectLiteralとしてparse不可能なので, これが有効になるpathがない</p>
+</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="contents.md">contents.md</a>
+            </aside>
+            
+            <aside class="page_number">
+              20/22
             </aside>
           </footer>
         </div>
@@ -2331,7 +2433,7 @@ function test(a) {
             </aside>
             
             <aside class="page_number">
-              19/20
+              21/22
             </aside>
           </footer>
         </div>
@@ -2359,7 +2461,7 @@ function test(a) {
             </aside>
             
             <aside class="page_number">
-              20/20
+              22/22
             </aside>
           </footer>
         </div>
@@ -2482,14 +2584,26 @@ function test(a) {
       
       
       <tr id="toc-row-19">
-        <th><a href="#slide19">for-in with initializer</a></th>
+        <th><a href="#slide19">LHS</a></th>
         <td><a href="#slide19">19</a></td>
       </tr>
       
       
       <tr id="toc-row-20">
-        <th><a href="#slide20">questions</a></th>
+        <th><a href="#slide20">draft bug</a></th>
         <td><a href="#slide20">20</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-21">
+        <th><a href="#slide21">for-in with initializer</a></th>
+        <td><a href="#slide21">21</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-22">
+        <th><a href="#slide22">questions</a></th>
+        <td><a href="#slide22">22</a></td>
       </tr>
       
       

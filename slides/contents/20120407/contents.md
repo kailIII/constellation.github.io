@@ -121,10 +121,10 @@ Semantics
 - +0 is -0 => false
 - Map / Setにおけるequalityの基盤
 - Strict Equality Algorithm(=== / !==)と異なる
-    - CoffeeScriptやばい...
-- 実は昔からあるSameValue algorithmがuserlandで見えるようになったもの
+    - CoffeeScript大敗北...
+- 実は昔からあるSameValue algorithmがuser levelで見えるようになったもの
     - SameValue algorithmはproperty代入の同一性検査とかに使われていました
-    - writableがfalseでSameValueじゃなければrejectとか
+    - writableがfalseでSameValueじゃなければrejectとかそういう
 
 ---
 
@@ -134,6 +134,9 @@ Contextual Keyword
 - このis / isntはContextual Keyword
 - これにかぎらず, ES.nextではStatement先頭以外のkeywordは大体contextual keyword
     - ofとか
+    - Statement先頭のものは, 変数名と区別がつかないので, keywordにせざるを得ない
+    - moduleとかはkeyword
+    - break the webのよかん...
 - つまり, keywordではなく, 文脈依存でkeywordのような扱われ方をするということ
 - 例えば, is / isntはcontextual keywordなので
 
@@ -221,6 +224,46 @@ Date with NaN
 - section 15.9.5.2
 
 > If this time value is NaN, the String value is "Invalid Date"
+
+---
+
+LHS
+===
+
+- section 11.13
+- LHSについて改訂
+- LHSがPrimaryExpression : ( Expression ) についてLeftHandSideExpressionじゃなくなるとout
+
+
+        !javascript
+        (1, 2, 3) = 20;
+
+
+- とかがSyntaxErrorに (ES5でははReferenceError)
+
+---
+
+draft bug
+=========
+
+- ES.next draftのbug
+- destructuring-assignmentについて
+- destructuring-assignmentはAssignmentBindingPatternについては以下の文法を認めている
+
+        !javascript
+        ({ responseText }) = res;
+
+- section 11.13 Runtime Semantics
+
+> If LeftHandSideExpression is neither an ObjectLiteral nor an ArrayLiteral then
+
+- destructuring-assignmentは一回ObjectLiteral or ArrayLiteralとしてparseしてみて, その後, 再解釈という形式を取る
+- なので上記の形式は,
+
+        !javascript
+        ({ responseText })
+
+- がObjectLiteralとしてparse不可能なので, これが有効になるpathがない
 
 ---
 
