@@ -213,6 +213,53 @@ Inheritance
 
 ---
 
+ES.next Library Extension
+=========================
+
+---
+
+ES.next Library Extension
+=========================
+
+- http://wiki.ecmascript.org/doku.php?id=harmony:more\_math\_functions
+- String
+- Number
+- Math
+- に便利関数を増やそうの会!
+
+---
+
+String
+======
+
+- repeat
+- startsWith
+- endsWith
+- contains
+- toArray
+
+---
+
+Number
+======
+
+- toInteger
+- Globalのものも
+    - isFinite
+    - parseFloat
+
+--- 
+
+Math
+====
+- Community Feedback
+    - https://bugs.ecmascript.org/show\_bug.cgi?id=309
+    - https://bugs.ecmascript.org/show\_bug.cgi?id=314
+- 欲しい数学関数がある方は今のうちに!
+    - この影響で, cbrtとか入りました
+
+---
+
 その他
 ======
 
