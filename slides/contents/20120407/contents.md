@@ -250,6 +250,8 @@ enumeration order
 >   properties with uint32 names, kept in integer order
 >   all other properties, kept in creation order
 
+---
+
 LHS
 ===
 
@@ -270,7 +272,6 @@ draft bug
 =========
 
 - ES.next draftのbug
-- destructuring-assignmentについて
 - destructuring-assignmentはAssignmentBindingPatternについては以下の文法を認めている
 
         !javascript
@@ -281,12 +282,7 @@ draft bug
 > If LeftHandSideExpression is neither an ObjectLiteral nor an ArrayLiteral then
 
 - destructuring-assignmentは一回ObjectLiteral or ArrayLiteralとしてparseしてみて, その後, 再解釈という形式を取る
-- なので上記の形式は,
-
-        !javascript
-        ({ responseText })
-
-- がObjectLiteralとしてparse不可能なので, これが有効になるpathがない
+- なので上記の形式は ({ responseText }) が, ObjectLiteralとしてparse不可能なので, これが有効になるpathがない
 
 ---
 
