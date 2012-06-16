@@ -162,6 +162,15 @@ Contextual Keyword
 
 ---
 
+Keyword
+=======
+
+- Statement先頭の場合はどうしても予約語
+- let / module
+
+
+---
+
 TriangleLiteral
 ===============
 
