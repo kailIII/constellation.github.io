@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<!--
+  slide template
+  original authors:
+           Luke Mahe (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>ECMAScript tools - composable modules and transpiler infrastructure</title>
+    <meta charset='utf-8'>
+    <script src='http://constellation.github.com/slides/slides.js'></script>
+    <style>
+    h2 a {
+      color: black !important;
+    }
+    h2 a:hover {
+      color: #999 !important;
+    }
+    .bordered_icon {
+      width: 64px;
+      height: 64px;
+      padding: 2px;
+      border: 1px solid #DDD;
+    }
+    .profile_icon {
+      width: 32px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid #DDD;
+      margin-right: 5px;
+      line-height: 1.4;
+    }
+    .profile_text {
+      vertical-align: top;
+    }
+    .number {
+      text-align: right;
+    }
+    dl {
+      padding-left: 30px;
+    }
+    dt {
+      padding-left: 15px;
+      border-left: 15px solid #CCC;
+    }
+    dd {
+      margin-left: 0px;
+      padding-left: 100px;
+      border-left: 15px solid #CCC;
+      border-bottom: 15px solid #FFF;
+    }
+    .bytecode {
+      font-size: 20px;
+      line-height: 26px;
+    }
+    p.small {
+      margin-top: 10px;
+      line-height: 28px;
+      font-size: 24px;
+    }
+    </style>
+    <link rel="shortcut icon" href="http://25.media.tumblr.com/avatar_fccdd5b6c51d_16.png" />
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-regular template-io-2011'>
+      <article>
+        <h1>ECMAScript tools</h1>
+        <p>composable modules and transpiler infrastructure</p>
+        <br>
+        <p>Yusuke Suzuki (a.k.a <a href="http://twitter.com/Constellation">Constellation</a>)</p>
+      </article>
+
+      <article>
+        <h3>self introduction</h3>
+        <img class="centered" src="intro.png" style="max-width: 90%" alt="GitHub screenshot" />
+        <ul>
+          <li><a href="https://github.com/Constellation/iv">ECMAScript engine iv / lv5 (written in C++)</a> owner</li>
+          <li><a href="https://github.com/ariya/esprima">Esprima</a> committer</li>
+          <li><a href="https://github.com/Constellation/escodegen">Escodegen</a> owner</li>
+          <li><a href="https://github.com/Constellation/esmangle">Esmangle</a> owner</li>
+        </ul>
+      </article>
+
+      <article>
+        <h2>background</h2>
+      </article>
+
+      <article>
+        <h3>ECMAScript everywhere</h3>
+        <p>ECMAScript is now widely used</p>
+        <ul>
+          <li>client side</li>
+          <li>server side</li>
+          <li>databases</li>
+        </ul>
+        <p>And ECMAScript tools are also developed widely</p>
+      </article>
+
+      <article>
+        <h3>ECMAScript tools</h3>
+        <ul>
+          <li>tools<ul>
+            <li><a href="https://github.com/mishoo/UglifyJS">UglifyJS</a></li>
+            <li><a href="https://developers.google.com/closure/compiler/">closure compiler</a></li>
+          </ul></li>
+          <li>transpilers<ul>
+            <li><a href="http://coffeescript.org/">CoffeeScript</a></li>
+            <li><a href="http://roy.brianmckenna.org/">Roy</a></li>
+            <li><a href="http://www.typescriptlang.org/">TypeScript</a></li>
+            <li><a href="http://jsx.github.com/">JSX</a> developed by DeNA</li>
+          </ul></li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Problem - Transpiler</h3>
+        <ul>
+          <li>Debugging is very diffcult because of lack of source information</li>
+          <li>We should map original code line/column information to generated code</li>
+          <li>SourceMap solves this problem</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Problem - SourceMap</h3>
+        <ul>
+          <li>transpilers reproduce SourceMap attaching code</li>
+          <li>transpilers becomes all-in-one<br>reproduce all following modules
+            <ul>
+              <li>parser</li>
+              <li>code generator</li>
+              <li>source map generator</li>
+            </ul></li>
+          <li>And minified generated JS from transpiling language cannot provide SourceMap...</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Problem - SourceMap</h3>
+        <img class="centered" src="problem.png" style="max-width: 90%" alt="SourceMap problem" />
+      </article>
+
+      <article>
+        <h3>To solve it</h3>
+        <p>Transpiler must also do minify task...</p>
+        <br>
+        <strong>As the result, current complex ECMAScript tools become all-in-one because of lack of composability</strong>
+        <ul>
+          <li>create parser</li>
+          <li>create code generator</li>
+          <li>create source map</li>
+          <li>create minifier</li>
+          <li>create other language tools (such as coverage/profiling)</li>
+        </ul>
+      </article>
+
+      <article>
+        <h2>composable modules</h2>
+      </article>
+
+      <article>
+        <h3>Why aren't they composable?</h3>
+        <p>Because they use raw script text as IR</p>
+        <br>
+        <img class="centered" src="lack.png" style="max-width: 90%" alt="passing raw text" />
+      </article>
+
+      <article>
+        <h3>IR</h3>
+        <p>We suggest using <a href="https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API">Mozilla JS AST</a> as IR</p>
+        <img class="centered" src="api.png" style="max-width: 90%; margin-top: 20px;" alt="Parser API AST" />
+      </article>
+
+      <article>
+        <h3>AST example</h3>
+        <pre>var i = 42;</pre>
+        <pre style="font-size:16px;line-height:20px">{
+    "type": "Program",
+    "body": [
+        {
+            "type": "VariableDeclaration",
+            "declarations": [
+                {
+                    "type": "VariableDeclarator",
+                    "id": {
+                        "type": "Identifier",
+                        "name": "i"
+                    },
+                    "init": {
+                        "type": "Literal",
+                        "value": 42
+                    }
+                }
+            ],
+            "kind": "var"
+        }
+    ]
+}</pre>
+      </article>
+
+      <article>
+        <h3>AST as IR</h3>
+        <p>By using AST as IR, we can pass rich information</p>
+        <p>And we can develop modules using AST as IR and compose them</p>
+      </article>
+
+      <article>
+        <h2>modules</h2>
+      </article>
+
+      <article>
+        <h3>Introduction</h3>
+        <p>We'll introduce mainly 3 modules</p>
+        <ul>
+          <li><a href="http://esprima.org/">Esprima</a></li>
+          <li><a href="https://github.com/Constellation/escodegen">Escodegen</a></li>
+          <li><a href="http://constellation.github.com/esmangle/">Esmangle</a></li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Esprima</h3>
+        <p>ECMAScript parsing infrastructure for multipurpose analysis : <a href="http://esprima.org/">link</a></p>
+        <img class="centered" src="esprima.png" style="max-width: 90%; margin-top: 20px;" alt="Esprima page" />
+      </article>
+
+      <article>
+        <h3>Esprima</h3>
+        <p>Esprima provides complete ECMAScript parser (including strict-mode syntax check)</p>
+        <p><a href="http://esprima.org/demo/parse.html">Parser demo</a></p>
+        <img class="centered" src="esprima-tree.png" style="max-width: 90%; margin-top: 10px;" alt="Esprima tree" />
+      </article>
+
+      <article>
+        <h3>Esprima</h3>
+        <table>
+        <tbody>
+          <tr>
+            <td>Input</td><td>JavaScript code</td>
+          </tr>
+          <tr>
+            <td>Output</td><td>Mozilla JavaScript AST</td>
+          </tr>
+        </tbody>
+        </table>
+        <img class="centered" src="esprima-use.png" style="max-width: 90%; margin-top: 80px;" alt="Esprima use" />
+      </article>
+
+      <article>
+        <h3>Escodegen</h3>
+        <p>ECMAScript code generator : <a href="https://github.com/Constellation/escodegen">link</a></p>
+        <img class="centered" src="escodegen.png" style="max-width: 90%; margin-top: 20px;" alt="Escodegen page" />
+      </article>
+
+      <article>
+        <h3>Escodegen</h3>
+        <p>Escodegen provides ECMAScript code generator</p>
+        <p><a href="http://constellation.github.com/escodegen/demo/index.html">code generator demo</a></p>
+        <br>
+        <p>principle:</p>
+        <pre>// structurally equal
+parse(generate(parse(code))) === parse(code)</pre>
+        <p>Escodegen <strong>do not</strong> mangle names and do other things</p>
+        <p>This keeps module simple and composable</p>
+      </article>
+
+      <article>
+        <h3>Escodegen</h3>
+        <table>
+        <tbody>
+          <tr>
+            <td>Input</td><td>Mozilla JavaScript AST</td>
+          </tr>
+          <tr>
+            <td>Output</td><td>JavaScript</td>
+          </tr>
+        </tbody>
+        </table>
+        <img class="centered" src="escodegen-use.png" style="max-width: 90%; margin-top: 80px;" alt="Esprima use" />
+      </article>
+
+      <article>
+        <h3>Esmangle</h3>
+        <p>ECMAScript mangler / minifier / optimizer : <a href="http://constellation.github.com/esmangle/">link</a></p>
+        <img class="centered" src="esmangle.png" style="max-width: 90%; margin-top: 20px;" alt="Esmangle page" />
+      </article>
+
+      <article>
+        <h3>Esmangle</h3>
+        <p>Esmangle doesn't parse / generate code. It's only responsible to optimizing AST</p>
+        <pre style="font-size:16px;line-height:20px">function upperBound(array, func) {
+    var diff, len, i, current;
+
+    len = array.length;
+    i = 0;
+
+    while (len) {
+        diff = len >>> 1;
+        current = i + diff;
+        if (func(array[current])) {
+            len = diff;
+        } else {
+            i = current + 1;
+            len -= diff + 1;
+        }
+    }
+    return i;
+}</pre>
+<pre style="font-size:16px;line-height:20px;white-space:pre-wrap;">function upperBound(e,f){var b,a,c,d;a=e.length,c=0;while(a)b=a>>>1,d=c+b,f(e[d])?a=b:(c=d+1,a-=b+1);return c}</pre>
+      </article>
+
+      <article>
+        <h3>Esmangle</h3>
+        <table>
+        <tbody>
+          <tr>
+            <td>Input</td><td>Mozilla JavaScript AST</td>
+          </tr>
+          <tr>
+            <td>Output</td><td>Mozilla JavaScript AST</td>
+          </tr>
+        </tbody>
+        </table>
+        <img class="centered" src="esmangle-use.png" style="max-width: 90%; margin-top: 80px;" alt="Esmangle use" />
+        <p>Because it uses AST as IR, modules can preserve original line/column information</p>
+      </article>
+
+      <article>
+        <h3>And other tools</h3>
+        <p>For example...</p>
+        <ul>
+        <li><a href="https://github.com/michaelficarra/CoffeeScriptRedux">CoffeeScriptRedux</a> can produce Mozilla JS AST
+        <img class="centered" src="coffee-use.png" style="max-width: 90%; margin-top: 80px;" alt="CoffeeScriptRedux compiler use" />
+        </li>
+        </ul>
+        <br>
+        <p>And we can develop other small (or large) modules using AST as IR</p>
+      </article>
+
+      <article>
+        <h2>combine them to large tools</h2>
+      </article>
+
+      <article>
+        <h3>Modules are composable</h3>
+        <p>Because they use standarized IR - Mozilla JS AST</p>
+        <p>We can use them and combine them into large tools</p>
+        <br>
+        <p><strong>These modules become transpiler infrastructure!</strong></p>
+      </article>
+
+      <article>
+        <h3>Example 1 : Esmangle minifier</h3>
+        <p><a href="http://constellation.github.com/esmangle/">Esmangle minifier</a></p>
+        <p>It can produce SourceMap to original code</p>
+        <img class="centered" src="esmangle-minifier.png" style="max-width: 100%; margin-top: 50px;" alt="Esmangle minifier" />
+      </article>
+
+      <article>
+        <h3>Example 2 : CoffeeScriptRedux</h3>
+        <p><a href="https://github.com/michaelficarra/CoffeeScriptRedux">new CoffeeScript compiler</a> - well-modularized compiler</p>
+        <p>CoffeeScriptRedux compiler uses Escodegen as its backend</p>
+        <img class="centered" src="coffee-script-redux.png" style="max-width: 100%; margin-top: 50px;" alt="CoffeeScriptRedux" />
+      </article>
+
+      <article>
+        <h3>Example 3 : sweet.js</h3>
+        <p><a href="http://sweetjs.org/">Sweet.js</a> brings hygienic macros from languages like Scheme and Rust to JavaScript</p>
+        <p>sweet.js also uses Escodegen as its backend</p>
+        <img class="centered" src="sweetjs.png" style="max-width: 100%; margin-top: 50px;" alt="sweet.js" />
+        <img class="centered" src="sweetjs-preview.png" style="max-width: 100%; margin-top: 50px;" alt="sweet.js preview" />
+      </article>
+
+      <article>
+        <h3>Example 4 : istanbul</h3>
+        <p><a href="https://github.com/yahoo/istanbul">istanbul</a> is coverage tool using Esprima & Escodegen</p>
+        <img class="centered" src="istanbul.png" style="max-width: 100%; margin-top: 50px;" alt="istanbul" />
+        <p>istanbul screen shot</p>
+        <img class="centered" src="istanbul-preview.png" style="max-width: 100%; margin-top:10px;" alt="istanbul preview" />
+      </article>
+
+      <article>
+        <h3>Other examples</h3>
+        <ul>
+          <li><a href="http://lljs.org/">LLJS</a> consists of modified Esprima and Escodegen</li>
+          <li><a href="https://github.com/jshint/jshint/">JSHint</a> uses Esprima for its ECMAScript parser</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>And...</h3>
+        <p>If we develop modules using AST as IR, we can apply them to all transpiling languages that produce AST</p>
+        <p>For example...</p>
+        <ul>
+          <li>
+          <li>We plan to create code coverage tool for CoffeeScript, by processing JS AST</li>
+        </ul>
+      </article>
+
+      <article>
+        <h2>conclusion</h2>
+      </article>
+
+      <article>
+        <h3>Conclusion</h3>
+        <ul>
+          <li>We present composable modules for ECMAScript tooling</li>
+          <li>By using them, we can construct large tools</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Any Questions?</h3>
+      </article>
+    </section>
+  </body>
+</html>
