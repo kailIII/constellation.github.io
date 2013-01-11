@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<!--
+  slide template
+  original authors:
+           Luke Mahe (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>iv / lv5 ECMAScript engine</title>
+    <meta charset='utf-8'>
+    <script src='http://constellation.github.com/slides/slides.js'></script>
+    <style>
+    h2 a {
+      color: black !important;
+    }
+    h2 a:hover {
+      color: #999 !important;
+    }
+    .bordered_icon {
+      width: 64px;
+      height: 64px;
+      padding: 2px;
+      border: 1px solid #DDD;
+    }
+    .profile_icon {
+      width: 32px;
+      height: 32px;
+      padding: 2px;
+      border: 1px solid #DDD;
+      margin-right: 5px;
+      line-height: 1.4;
+    }
+    .profile_text {
+      vertical-align: top;
+    }
+    .number {
+      text-align: right;
+    }
+    dl {
+      padding-left: 30px;
+    }
+    dt {
+      padding-left: 15px;
+      border-left: 15px solid #CCC;
+    }
+    dd {
+      margin-left: 0px;
+      padding-left: 100px;
+      border-left: 15px solid #CCC;
+      border-bottom: 15px solid #FFF;
+    }
+    .bytecode {
+      font-size: 20px;
+      line-height: 26px;
+    }
+    p.small {
+      margin-top: 10px;
+      line-height: 28px;
+      font-size: 24px;
+    }
+    </style>
+    <link rel="shortcut icon" href="http://25.media.tumblr.com/avatar_fccdd5b6c51d_16.png" />
+  </head>
+  <body style='display: none'>
+    <section class='slides layout-regular template-io-2011'>
+      <article>
+        <h1>iv / lv5 ECMAScript engine</h1>
+        <p>鈴木勇介</p>
+        <p class="small">慶應義塾大学 理工学部 4年</p>
+        <p class="small">ECMA262の最新版5.1(June 2011)の仕様に忠実な処理系を実装した</p>
+      </article>
+
+      <article>
+        <h3>その後</h3>
+        <ul>
+          <li>Test 262 Conformance Suite を ECMA402 対応を除き全てパスした</li>
+          <li>ECMA262 5th の bug を発見し報告した</li>
+          <li>ECMA402 に貢献した</li>
+          <li>ECMA262 6th draft に部分的に対応した</li>
+          <li>Register VM に変更した</li>
+          <li>RegExp JIT を実装した</li>
+          <li>Context Threading JIT を実装した</li>
+          <li>Polymorphic Inline Cache (PIC) を実装した</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Test 262 Conformance Suite</h3>
+        <ul>
+          <li>ECMA402: i18n API を除く全 11639 件のテストをパスした</li>
+          <li>lv5 によって発見した Test 262 の bug を報告, 修正した</li>
+    <li><a href="https://bugs.ecmascript.org/show_bug.cgi?id=215">215</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=218">218</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=270">270</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=271">271</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=287">287</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=294">294</a></li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>ECMA262</h3>
+        <p>ECMA262 5.1th の bug を発見し, 報告した</p>
+        <ul>
+    <li><a href="https://bugs.ecmascript.org/show_bug.cgi?id=129">Array.prototype.concat</a></li>
+    <li><a href="https://bugs.ecmascript.org/show_bug.cgi?id=387">[[Call]]</a></li>
+    <li><a href="https://bugs.ecmascript.org/show_bug.cgi?id=417">Array.prototype.slice</a></li>
+        </ul>
+        <p>これらは 6th にて修正される予定</p>
+      </article>
+
+      <article>
+        <h3>ECMA402</h3>
+        <ul>
+          <li>ECMA402: ECMAScript Internationalization API に部分的に対応した</li>
+          <li>Test 262 における ECMA402 関連 test の bug 発見及び仕様への<a href="https://mail.mozilla.org/pipermail/es-discuss/2012-May/022856.html">フィードバック</a>を行った</li>
+        </ul>
+        <img class="centered" src="ecma402.png" style="max-width:100%" alt="ECMA402" />
+      </article>
+
+      <article>
+        <h3>ECMA262 6th draft</h3>
+        <ul>
+          <li>ECMA262 6th の策定が進んでいる</li>
+          <li>ES6 library extension, Map, Set, WeakMap など文法拡張を伴わない機能を実装した</li>
+          <li>ECMA262 6th draft の bug を発見, 報告した</li>
+    <li><a href="https://bugs.ecmascript.org/show_bug.cgi?id=415">415</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=262">262</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=368">368</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=415">414</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=415">415</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=416">416</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=673">664</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=673">665</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=673">666</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=673">673</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=673">1119</a>
+    <a href="https://bugs.ecmascript.org/show_bug.cgi?id=673">1120</a></li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Register VM - 1</h3>
+        <ul>
+          <li>Stack VM から Register VM に実装を変更した</li>
+          <li><a href="http://www.webkit.org/perf/sunspider/sunspider.html">SunSpider benchmark</a> を利用して性能を評価した</li>
+          <li>Stack VM (tag 0.0.1)</li>
+          <ul><li>1512.7ms</li></ul>
+          <li>Register VM (当時)</li>
+          <ul><li>1136.3ms</li></ul>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Register VM - 2</h3>
+        <img class="centered" src="graph.png" style="max-width:100%" alt="Register VM vs Stack VM" />
+      </article>
+
+      <article>
+        <h3>RegExp JIT</h3>
+        <ul>
+          <li>bytecode で表現された RegExp を x64 machine code に JIT compile した</li>
+          <li>SunSpider regexp-dna bench が 84ms から 42ms へ高速化した</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Context Threading JIT compiler</h3>
+        <ul>
+          <li>Context Threading JIT compiler を実装した</li>
+          <li>Register VM bytecode を受け取って x64 機械語に JIT compile した</li>
+          <ul><li>online assembler として <a href="https://github.com/herumi/xbyak">xbyak</a>を利用した</li></ul>
+        </ul>
+        <img class="centered" src="./breaker.png" style="max-width:100%;"></img>
+      </article>
+
+      <article>
+        <h3>Polymorphic Inline Cache - 1</h3>
+        <p>Polymorphic Inline Cache を実装した</p>
+        <p>ECMAScript object の形状を表す Map を定義. property 追加などで形状が変わると transition を起こし別の Map へ遷移する. 遷移元 Map に遷移先と遷移理由を記録しておくことで, 同じ手順で遷移した形状の等しい object が同じ Map を持つようになる</p>
+        <p>形状が同じ事を利用して, 一度 property lookup のために Hashtable を引いた結果を code 中に cache しておき, 次回以降 Map が一致した場合, Hashtable を引かずに offset からアクセスする.</p>
+        <p>1 つの lookup site で複数の Map をハンドルする (Polymorphic)</p>
+      </article>
+
+      <article>
+        <h3>Polymorphic Inline Cache - 2</h3>
+        <img class="centered" src="./pic.png" style="max-height:600px;"></img>
+      </article>
+
+      <article>
+        <h3>評価</h3>
+        <p>SunSpider benchmark 及び V8 benchmark にて実行時間を計測する</p>
+      </article>
+
+      <article>
+        <h3>評価 - SunSpider</h3>
+        <img class="centered" src="./sunspider.png" style="max-width:100%;margin-top:50px;"></img>
+      </article>
+
+      <article>
+        <h3>評価 - V8</h3>
+        <img class="centered" src="./v8.png" style="max-width:100%;margin-top:50px;"></img>
+      </article>
+
+      <article>
+        <h3>まとめ</h3>
+        <ul>
+          <li>ECMA262 及び ECMA402 に貢献した</li>
+          <li>Register VM を作成して評価した</li>
+          <li>Context Threading JIT 及び PIC を作成して評価した</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>将来の課題</h3>
+        <ul>
+          <li>ECMA262 6th の文法を含めた対応開始</li>
+          <li>外から使いやすい library の interface の提供</li>
+          <li>SSA ベースの最適化 JIT compiler の作成</li>
+        </ul>
+      </article>
+    </section>
+  </body>
+</html>
