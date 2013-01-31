@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Esprima with E4X</title>
+<script src="../3rdparty/platform.js"></script>
+<script src="checkenv.js"></script>
+<script src="esprima.js"></script>
+<script src="../assets/json2.js"></script>
+<script src="../assets/codemirror/codemirror.js"></script>
+<script src="../assets/codemirror/javascript.js"></script>
+<script src="../assets/yui/yahoo-dom-event.js"></script>
+<script src="../assets/yui/treeview-min.js"></script>
+<link rel="stylesheet" type="text/css" href="../assets/codemirror/codemirror.css"/>
+<link rel="stylesheet" type="text/css" href="../assets/codemirror/solarized.css"/>
+<link rel="stylesheet" type="text/css" href="../assets/yui/treeview.css"/>
+<link rel="stylesheet" type="text/css" href="../assets/style.css"/>
+<link rel="stylesheet" type="text/css" href="parse.css"/>
+<style>
+.ygtvfocus .ygtvlabel,
+.ygtvfocus .ygtvlabel:link,
+.ygtvfocus .ygtvlabel:visited,
+.ygtvfocus .ygtvlabel:hover {
+    background-color: #eee;
+}
+
+.highlight {
+    background-color: #add8e6;
+    background-color: rgba(173, 216, 230, 0.6);
+}
+
+label {
+    margin-left: 5px;
+    margin-right: 15px;
+}
+
+table th, table td {
+    text-align: left;
+    background-color: white;
+}
+
+tbody tr:nth-child(odd) td {
+    background-color: white;
+}
+
+tbody td {
+    background-color: white;
+}
+
+h1 {
+  text-align: center
+}
+</style>
+<script>
+/*jslint sloppy:true browser:true */
+/*global esprima:true, YAHOO:true */
+var parseId;
+
+function updateTree(syntax) {
+
+    if (window.tree) {
+        window.tree.destroy();
+        window.tree = null;
+    }
+
+    if (typeof syntax === 'undefined') {
+        return;
+    }
+
+    if (document.getElementById('tab_tree').className !== 'active') {
+        return;
+    }
+
+    window.tree = new YAHOO.widget.TreeView("treeview");
+    document.getElementById('collapse').onclick = function () { window.tree.collapseAll(); };
+    document.getElementById('expand').onclick = function () { window.tree.expandAll(); };
+
+    function isArray(o) {
+        return (typeof Array.isArray === 'function') ? Array.isArray(o) :
+            Object.prototype.toString.apply(o) === '[object Array]';
+    }
+
+    function convert(name, node) {
+        var result, i, key, value, child;
+
+        switch (typeof node) {
+        case 'string':
+            return {
+                type: 'Text',
+                label: name + ': ' + node
+            };
+
+        case 'number':
+        case 'boolean':
+            return {
+                type: 'Text',
+                label: name + ': ' + String(node)
+            };
+
+        case 'object':
+            if (!node) {
+                return {
+                    type: 'Text',
+                    label: name + ': null'
+                };
+            }
+            if (node instanceof RegExp) {
+                return {
+                    type: 'Text',
+                    label: name + ': ' + node.toString()
+                };
+            }
+            result = {
+                type: 'Text',
+                label: name,
+                expanded: true,
+                children: []
+            };
+            if (isArray(node)) {
+                if (node.length === 2 && name === 'range') {
+                    result.label = name + ': [' + node[0] + ', ' + node[1] + ']';
+                } else {
+                    result.label = result.label + ' [' + node.length + ']';
+                    for (i = 0; i < node.length; i += 1) {
+                        key = String(i);
+                        value = node[i];
+                        child = convert(key, value);
+                        if (isArray(child.children) && child.children.length === 1) {
+                            result.children.push(child.children[0]);
+                        } else {
+                            result.children.push(convert(key, value));
+                        }
+                    }
+                }
+            } else {
+                if (typeof node.type !== 'undefined') {
+                    result.children.push({
+                        type: 'Text',
+                        label: node.type,
+                        expanded: true,
+                        children: [],
+                        data: node
+                    });
+                    for (key in node) {
+                        if (Object.prototype.hasOwnProperty.call(node, key)) {
+                            if (key !== 'type') {
+                                value = node[key];
+                                result.children[0].children.push(convert(key, value));
+                            }
+                        }
+                    }
+                } else {
+                    for (key in node) {
+                        if (Object.prototype.hasOwnProperty.call(node, key)) {
+                            value = node[key];
+                            result.children.push(convert(key, value));
+                        }
+                    }
+                }
+            }
+            return result;
+
+        default:
+            break;
+        }
+
+        return {
+            type: 'Text',
+            label: '?'
+        };
+    }
+
+    window.tree.subscribe('focusChanged', function (args) {
+        var from, to;
+
+        function convert(loc) {
+            return {
+                line: loc.line - 1,
+                ch:   loc.column
+            };
+        }
+
+        if (window.editorMark) {
+            window.editorMark.clear();
+            delete window.editorMark;
+        }
+        if (args.newNode && args.newNode.data && args.newNode.data.loc) {
+            from = convert(args.newNode.data.loc.start);
+            to = convert(args.newNode.data.loc.end);
+            window.editorMark = window.editor.markText(from, to, 'highlight');
+        }
+    });
+
+    window.tree.buildTreeFromObject(convert('Program body', syntax.body));
+    window.tree.render();
+}
+
+function parse(delay) {
+    if (parseId) {
+        window.clearTimeout(parseId);
+    }
+
+    parseId = window.setTimeout(function () {
+        var code, options, result, el, str;
+
+        // Special handling for regular expression literal since we need to
+        // convert it to a string literal, otherwise it will be decoded
+        // as object "{}" and the regular expression would be lost.
+        function adjustRegexLiteral(key, value) {
+            if (key === 'value' && value instanceof RegExp) {
+                value = value.toString();
+            }
+            return value;
+        }
+
+        if (typeof window.editor === 'undefined') {
+            code = document.getElementById('code').value;
+        } else {
+            code = window.editor.getValue();
+        }
+        options = {
+            comment: document.getElementById('comment').checked,
+            raw: document.getElementById('raw').checked,
+            range: document.getElementById('range').checked,
+            loc: document.getElementById('loc').checked,
+            tolerant: document.getElementById('tolerant').checked
+        };
+
+        document.getElementById('tokens').value = '';
+
+        try {
+
+            result = esprima.parse(code, options);
+            str = JSON.stringify(result, adjustRegexLiteral, 4);
+            options.tokens = true;
+            document.getElementById('tokens').value = JSON.stringify(esprima.parse(code, options).tokens,
+                adjustRegexLiteral, 4);
+            updateTree(result);
+        } catch (e) {
+            updateTree();
+            str = e.name + ': ' + e.message;
+            console.error(e.stack);
+        }
+
+        el = document.getElementById('syntax');
+        el.value = str;
+
+        el = document.getElementById('url');
+        el.value = location.protocol + "//" + location.host + location.pathname + '?code=' + encodeURIComponent(code);
+
+        parseId = undefined;
+    }, delay || 811);
+}
+</script>
+</head>
+<body class="yui-skin-sam">
+<div class="container">
+
+<h1>E4X <small>revives like a phoenix</small></h1>
+
+<p>Esprima harmony branch with complete E4X support: version <span id="version"></span>.</p>
+
+<p>Type ECMAScript code with <a href="http://www.ecma-international.org/publications/standards/Ecma-357.htm">E4X (ECMA357)</a>:</p>
+<div><textarea id="code" autofocus="autofocus" cols="70" rows="15" spellcheck="false">
+// 10.1.1
+    var order = <order>
+       <customer>
+           <firstname>John</firstname>
+           <lastname>Doe</lastname>
+       </customer>
+       <item>
+           <description>Big Screen Television</description>
+           <price>1299.99</price>
+           <quantity>1</quantity>
+       </item>
+    </order>
+
+    // Construct the full customer name
+    var name = order.customer.firstname + " " + order.customer.lastname;
+    // Calculate the total price
+    var total = order.item.price * order.item.quantity;
+
+// 10.3.1
+    var John = "<employee><name>John</name><age>25</age></employee>";
+    var Sue = "<employee><name>Sue</name><age>32</age></employee>";
+    var tagName = "employees";
+    var employees = new XML("<" + tagName +">" + John + Sue + "</" + tagName +">");
+
+// 10.3.2
+    function createTable() {
+        var doc = XML(document); // create an E4X wrapper for the document var mytablebody = doc..body.TABLE.TBODY;
+        for (var j=0;j<2;j++) {
+            mytablebody.TR[j] = ""; // append an empty table row
+            for (var i=0;i<2;i++) // append a cell with some content
+                mytablebody.TR[j].TD[i] = "cell is row " + j + ", column " + i;
+        }
+        doc..body.TABLE.@border = 2; // set the border attribute of the table
+   }
+
+// 10.4.1
+    var John = "<employee><name>John</name><age>25</age></employee>";
+    var Sue = "<employee><name>Sue</name><age>32</age></employee>";
+    var list = new XMLList(John + Sue);
+
+// 11.1.2
+    // Create a SOAP message
+    var message = <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+           soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+       <soap:Body>
+           <m:GetLastTradePrice xmlns:m="http://mycompany.com/stocks">
+              <symbol>DIS</symbol>
+           </m:GetLastTradePrice>
+       </soap:Body>
+    </soap:Envelope>
+    // declare the SOAP and stocks namespaces
+    var soap = new Namespace("http://schemas.xmlsoap.org/soap/envelope/");
+    var stock = new Namespace ("http://mycompany.com/stocks");
+    // extract the soap encoding style and body from the soap message
+    var encodingStyle = message.@soap::encodingStyle;
+    var body = message.soap::Body;
+    // change the stock symbol
+    message.soap::Body.stock::GetLastTradePrice.symbol = "MYCO";
+
+// 11.1.4
+    // an XML object representing a person with a name and age
+    var person = <person><name>John</name><age>25</age></person>;
+    // a variable containing an XML object representing two employees
+    var e = <employees>
+       <employee id="1"><name>Joe</name><age>20</age></employee>
+       <employee id="2"><name>Sue</name><age>30</age></employee>
+    </employees>;
+
+    for (var i = 0; i < 10; i++)
+       e[i] = <employee id={i}>                    // compute id value
+           <name>{names[i].toUpperCase()}</name>   // compute name value
+           <age>{ages[i]}</age>                    // compute age value
+       </employee>;
+
+
+    var tagname = "name";
+    var attributename = "id";
+    var attributevalue = 5;
+    var content = "Fred";
+    var x = <{tagname} {attributename}={attributevalue}>{content}</{tagname}>;
+
+    <name id="5">Fred</name>
+
+// 11.1.5
+    var docfrag = <><name>Phil</name><age>35</age><hobby>skiing</hobby></>;
+    var emplist = <>
+       <employee id="0" ><name>Jim</name><age>25</age></employee>
+       <employee id="1" ><name>Joe</name><age>20</age></employee>
+       <employee id="2" ><name>Sue</name><age>30</age></employee>
+    </>;
+
+// 11.2.1
+    var order = <order id = "123456" timestamp="Mon Mar 10 2003 16:03:25 GMT-0800 (PST)">
+       <customer>
+           <firstname>John</firstname>
+           <lastname>Doe</lastname>
+       </customer>
+       <item>
+           <description>Big Screen Television</description>
+           <price>1299.99</price>
+           <quantity>1</quantity>
+       </item>
+    </order>;
+    var customer = order.customer;         // get the customer element from the order
+    var id = order.@id;                    // get the id attribute from the order
+    var orderChildren = order.*;           // get all the child elements from the order element
+    varorderAttributes=order.@*;           //getalltheattributesfromtheorderelement
+
+    // get the first (and only) order [treating single element as a list]
+    var firstOrder = order[0];
+
+
+    var order = <order>
+       <customer>
+           <firstname>John</firstname>
+           <lastname>Doe</lastname>
+       </customer>
+       <item id = "3456">
+           <description>Big Screen Television</description>
+           <price>1299.99</price>
+           <quantity>1</quantity>
+       </item>
+       <item id = "56789">
+           <description>DVD Player</description>
+           <price>399.99</price>
+           <quantity>1</quantity>
+    </item>
+    </order>;
+    var descriptions = order.item.description;      // get the list of all item descriptions
+    var itemIds = order.item.@id;                   // get the list of all item id attributes
+    var secondItem = order.item[1];                 // get second item by numeric index
+    var itemChildren = order.item.*;                // get the list of all child elements in all items
+    var secondItemChild = order.item.*[1];          // get the second child from the list of all items
+
+// 11.2.2
+    var rectangle = <rectangle>
+       <x>50</x>
+       <y>75</y>
+       <length>20</length>
+       <width>30</width>
+    </rectangle>;
+    var numRectangles = rectangle.length(); // returns 1 – number of <rectangle> elements
+    var rectangleLength = rectangle.length; // returns 20 – content of <length> element
+    rectangle.length = 50;                  // change the length element of the rectangle
+
+// 11.2.2.1
+    var shipto= <shipto>
+       <name>Fred Jones</name>
+       <street>123 Foobar Ave.</street>
+       <citystatezip>Redmond, WA, 98008</citystatezip>
+    </shipto>
+
+    // calls String.toUpperCase on value of text node
+    var upperName = shipto.name.toUpperCase();
+
+    // calls String.split() on text node to parse address
+    var citystatezip = shipto.citystatezip.split(", ");
+
+    var state = citystatezip[1];            // line into individual city, state and zip values
+    var zip = citystatezip[2];
+
+// 11.2.3
+    var e = <employees>
+       <employee id="1"><name>Joe</name><age>20</age></employee>
+       <employee id="2"><name>Sue</name><age>30</age></employee>
+    </employees>;
+    var names = e..name; // get all the names in e
+
+// 11.2.4
+    var john = e.employee.(name == "John");                 // employees with name John
+    var twoemployees = e.employee.(@id == 0 || @id == 1);   // employees with id's 0 & 1
+    var emp = e.employee.(@id == 1).name;                   // name of employee with id 1
+
+    // get the two employees with ids 0 and 1 using a predicate
+    var twoEmployees = e..employee.(@id == 0 || @id == 1);
+
+    // get the two employees with the ids 0 and 1 using a for loop
+    var i = 0;
+    var twoEmployees = new XMLList();
+    for each (var p in e..employee) {
+          with (p) {
+              if (@id == 0 || @id == 1) {
+                  twoEmployees[i++] = p;
+              }
+          }
+    }
+
+// 11.3
+    delete order.customer.address;    // delete the customer address
+    delete order.customer.@id;        // delete the customer ID
+    delete order.item.price[0];       // delete the first item price
+    delete order.item;                // delete all the items
+
+// 11.4.1
+    // create an XMLList containing the elements <name>, <age> and <hobby>
+    var employeedata = <name>Fred</name> + <age>28</age> + <hobby>skiing</hobby>;
+    // create an XMLList containing three item elements extracted from the order element
+    var myitems = order.item[0] + order.item[2] + order.item[3];
+    // create a new XMLList containing all the items in the order plus one new one
+    var newitems = order.item + <item><description>new item</description></item>;
+
+
+    // add the prices of the first and third items in the order (coersion with unary +)
+    var totalPrice = +order.item[0].price + +order.item[2].price
+    // add the prices of the second and fourth items in the order (coersion using Number
+    // conversion function)
+    var totalPrice = Number(order.item[1].price) + Number(order.item[3].price)
+
+    // concatenate the street and the city of the customer's address (coersion with the empty
+    // string)
+    var streetcity = "" + order.customer.address.street + order.customer.address.city;
+    // concatenate the state and the zip of the customer's address (coersion using String
+    // conversion function)
+    var statezip = String(order.customer.address.state) + order.customer.address.zip;
+
+// 11.6.1
+    // change the value of the id attribute on the second item
+    order.item[1].@id = 123;
+    // add a new attribute to the second item
+    order.item[1].@newattr = "new value";
+    // construct an attribute list containing all the ids in this order
+    order.@allids = order.item.@id;
+
+    item.price = 99.95;                // change the price of the item
+    item.description = "Mobile Phone"; // change the description of the item
+
+// 11.6.2
+    // set the name of the only customer in the order to Fred Jones
+    order.customer.name = "Fred Jones";
+    // replace all the hobbies for the only customer in the order
+    order.customer.hobby = "shopping";
+    // attempt to set the sale date of a single item.
+    order.item.saledate = "05-07-2002";
+    // replace all the employee's hobbies with their new favorite pastime
+    emps.employee.(@id == 3).hobby = "working";
+
+    // replace the first employee with George
+    e.employee[0] = <employee><name>George</name><age>27</age></employee>;
+    // add a new employee to the end of the employee list
+    e.employee[e.employee.length()] = <employee><name>Frank</name></employee>;
+
+// 11.6.3
+    var e = <employees>
+       <employee id="1"><name>Joe</name><age>20</age></employee>
+       <employee id="2"><name>Sue</name><age>30</age></employee>
+    </employees>;
+    // insert employee 3 and 4 after the first employee
+    e.employee[0] += <employee id="3"><name>Fred</name></employee> +
+           <employee id="4"><name>Carol</name></employee>;
+
+    <employees>
+       <employee id="1"><name>Joe</name><age>20</age></employee>
+       <employee id="3"><name>Fred</name></employee>
+       <employee id="4"><name>Carol</name></employee>
+       <employee id="2"><name>Sue</name><age>30</age></employee>
+    </employees>;
+
+    var e = <employees>
+       <employee id="1"><name>Joe</name><age>20</age></employee>
+       <employee id="2"><name>Sue</name><age>30</age></employee>
+    </employees>;
+    // append employees 3 and 4 to the end of the employee list
+    e.employee += <employee id="3"><name>Fred</name></employee> +
+           <employee id="4"><name>Carol</name></employee>;
+
+    <employees>
+       <employee id="1"><name>Joe</name><age>20</age></employee>
+       <employee id="2"><name>Sue</name><age>30</age></employee>
+       <employee id="3"><name>Fred</name></employee>
+       <employee id="4"><name>Carol</name></employee>
+    </employees>;
+
+// 12.1
+    // declare some namespaces and a default namespace for the current scope
+    var soap = new Namespace("http://schemas.xmlsoap.org/soap/envelope/");
+    var stock = new Namespace("http://mycompany.com/stocks");
+    default xml namespace = soap;           // alternately, may specify full URI
+    // Create an XML initializer in the default (i.e., soap) namespace
+    var message = <Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+           soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+       <Body>
+           <m:GetLastTradePrice xmlns:m="http://mycompany.com/stocks">
+              <symbol>DIS</symbol>
+           </m:GetLastTradePrice>
+       </Body>
+    </Envelope>
+    // extract the soap encoding style using a QualifiedIdentifier (unqualified attributes are in // no namespace)
+    var encodingStyle = message.@soap::encodingStyle;
+    //extract the body from the soap message using the default namespace
+    var body = message.Body;
+    // change the stock symbol using the default namespace and qualified names
+    message.Body.stock::GetLastTradePrice.stock::symbol = "MYCO";
+
+// 12.2
+    // print all the employee names
+    for (var n in e..name) {
+        print ("Employee name: " + e..name[n]);
+    }
+    // print each child of the first item
+    for (var child in order.item[0].*) {
+        print("item child: " + order.item[0].*[child]);
+    }
+
+// 12.3
+    // print all the employee names
+    for each (var n in e..name) {
+        print ("Employee name: " + n);
+    }
+    // print each child of the first item
+    for each (var child in order.item[0].*) {
+        print("item child: " + child);
+    }
+
+// 13.4.3
+    var e = <employees>
+       <employee id="0" ><name>Jim</name><age>25</age></employee>
+       <employee id="1" ><name>Joe</name><age>20</age></employee>
+    </employees>;
+    // Add a new child element to the end of Jim's employee element
+    e.employee.(name == "Jim").appendChild(<hobby>snorkeling</hobby>);
+
+// 13.4.4.4
+    // get the id of the employee named Jim
+    e.employee.(name == "Jim").attribute("id");
+
+// 13.4.4.5
+    // print the attributes of an XML object
+    function printAttributes(x) {
+       for each (var a in x.attributes()) {
+           print("The attribute named " + a.name() + " has the value " + a);
+       }
+    }
+
+// 13.4.4.6
+    var name = customer.child("name");      // equivalent to: var name = customer.name;
+    var secondChild = customer.child(1);    // equivalent to: var secondChild = customer.*[1]
+
+// 13.4.4.7
+    // Get the ordinal index of the employee named Joe.
+    var joeindex = e.employee.(name == "Joe").childIndex();
+
+// 13.4.4.8
+    // Get child elements of first employee: returns an XMLList containing:
+    // <name>Jim</name>, <age>25</age> and <hobby>Snorkeling</hobby>
+    var emps = e.employee[0].children();
+
+// 13.4.4.27
+    // Get the parent element of the second name in "e". Returns <employee id="1" ...
+    var firstNameParent = e..name[1].parent()
+
+// 13.4.4.29
+    // Add a new child element to the front of John's employee element
+    e.employee.(name == "John").prependChild(<prefix>Mr.</prefix>);
+
+// 13.4.4.32
+    // Replace the first employee record with an open staff requisition
+    employees.replace(0, <requisition status="open"/>);
+    // Replace all item elements in the order with a single empty item
+    order.replace("item", <item/>);
+
+// 13.4.4.33
+    // Replace the entire contents of Jim's employee element
+    e.employee.(name == "Jim").setChildren(<name>John</name> + <age>35</age>);
+
+// 13.4.4.39
+    var item = <item>
+       <description>Laptop Computer</description>
+       <price>2799.95</price>
+       <quantity>1</quantity>
+    </item>;
+    // returns "Description stored as <description>Laptop Computer</description>"
+    var logmsg = "Description stored as " + item.description.toXMLString();
+    // returns "Thank you for purchasing a Laptop Computer!" (with tags removed)
+    var message = "Thank you for purchasing a " + item.description + "!";
+
+</textarea></div>
+<p id="codemirror" align="right"><small>The above code editor is based on <a href="http://codemirror.net" target="_blank">CodeMirror</a>.</small></p>
+<p><label><input type="checkbox" id="raw"> Preserve raw value of literals</label>
+<label><input type="checkbox" id="comment"> Include comments</label>
+<label><input type="checkbox" id="tolerant"> Tolerate errors</label></p>
+<p>Syntax node location info (start, end):
+<label><input type="checkbox" id="range">Index-based range</label>
+<label><input type="checkbox" id="loc">Line and column-based</label></p>
+<div class="tabs">
+    <ul>
+    <li id="tab_syntax" class="active">
+    <h3><a id="show_syntax">Syntax</a></h3>
+    <div class="tab">
+        <textarea id="syntax" rows="20" readonly></textarea>
+    </div>
+    </li>
+    <li id="tab_tokens">
+     <h3><a id="show_tokens">Tokens</a></h3>
+     <div class="tab">
+        <textarea id="tokens" rows="20" readonly></textarea>
+    </div>
+    </li>
+    <li id="tab_tree">
+    <h3><a id="show_tree">Tree</a></h3>
+    <div class="tab">
+        <span style="margin-left: 500px;"><input type="button" id="expand" value="Expand All">
+            <input type="button" id="collapse" value="Collapse All"></span>
+        <div id="treeview">
+        </div>
+    </div>
+    </li>
+    <li id="tab_url">
+    <h3><a id="show_url">URL</a></h3>
+    <div class="tab">
+        <input id="url" type="text" readonly onclick="this.select()">
+    </div>
+    </li>
+</ul>
+</div>
+
+
+<!--
+<div class="footer"><strong>Esprima</strong> is created by
+    <a href="http://ariya.ofilabs.com/about" target="_blank">Ariya Hidayat</a>. Follow <a href="http://twitter.com/ariyahidayat">@ariyahidayat</a> on Twitter.
+</div>
+-->
+
+<div id="testbox"><textarea id="test"></textarea></div>
+</div>
+<a href="https://github.com/Constellation/esprima/tree/e4x"><img style="position: absolute; top: 0; right: 0; border: 0;" src="../assets/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+</body>
+<script>
+window.onload = function () {
+    var id, el;
+
+    id = function (i) {
+        return document.getElementById(i);
+    };
+
+    el = id('version');
+    if (typeof el.innerText === 'string') {
+        el.innerText = esprima.version;
+    } else {
+        el.textContent = esprima.version;
+    }
+    try {
+        parse(1);
+    } catch (e) { }
+
+    id('show_tree').onclick = function () {
+        id('tab_tree').className = 'active';
+        id('tab_syntax').className = '';
+        id('tab_tokens').className = '';
+        id('tab_url').className = '';
+        parse(1);
+    };
+
+    id('show_syntax').onclick = function () {
+        id('tab_tree').className = '';
+        id('tab_syntax').className = 'active';
+        id('tab_tokens').className = '';
+        id('tab_url').className = '';
+    };
+
+    id('show_tokens').onclick = function () {
+        id('tab_tree').className = '';
+        id('tab_syntax').className = '';
+        id('tab_tokens').className = 'active';
+        id('tab_url').className = '';
+    };
+
+    id('show_url').onclick = function () {
+        id('tab_tree').className = '';
+        id('tab_syntax').className = '';
+        id('tab_tokens').className = '';
+        id('tab_url').className = 'active';
+    };
+};
+</script>
+<script>
+/*jslint sloppy:true browser:true */
+/*global CodeMirror:true */
+try {
+    function quickParse() { parse(1); }
+    document.getElementById('comment').onchange = quickParse;
+    document.getElementById('raw').onchange = quickParse;
+    document.getElementById('range').onchange = quickParse;
+    document.getElementById('loc').onchange = quickParse;
+    document.getElementById('tokens').onchange = quickParse;
+    document.getElementById('tolerant').onchange = quickParse;
+
+    // Special handling for IE.
+    document.getElementById('comment').onclick = quickParse;
+    document.getElementById('raw').onclick = quickParse;
+    document.getElementById('range').onclick = quickParse;
+    document.getElementById('loc').onclick = quickParse;
+    document.getElementById('tokens').onclick = quickParse;
+    document.getElementById('tolerant').onclick = quickParse;
+
+    window.checkEnv();
+
+    // This is just testing, to detect whether CodeMirror would fail or not
+    window.editor = CodeMirror.fromTextArea(document.getElementById("test"));
+
+    window.editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        lineNumbers: true,
+        matchBrackets: true,
+        onChange: parse,
+        theme: 'solarized light',
+        indentUnit: 4
+    });
+
+    (function () {
+        'use strict';
+        var queries, elements, code, i, iz, pair;
+        if (location.search) {
+            queries = {};
+            elements = location.search.substring(1).split(/[;&]/);
+            for (i = 0, iz = elements.length; i < iz; i += 1) {
+                pair = elements[i].split('=');
+                if (pair.length === 2) {
+                    queries[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+                }
+            }
+            code = queries['code'];
+            if (code) {
+                window.editor.setValue(code);
+            }
+        }
+    }());
+} catch (e) {
+    // CodeMirror failed to initialize, possible in e.g. old IE.
+    document.getElementById('codemirror').innerHTML = '';
+    document.getElementById('code').onchange = parse;
+    document.getElementById('code').onkeydown = parse;
+} finally {
+    document.getElementById('testbox').parentNode.removeChild(document.getElementById('testbox'));
+}
+</script>
+</html>
