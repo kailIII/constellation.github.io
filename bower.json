@@ -1,0 +1,25 @@
+{
+  "name": "constellation.github.com",
+  "version": "0.0.0",
+  "homepage": "https://constellation.github.io/",
+  "authors": [
+    "Yusuke Suzuki <utatane.tea@gmail.com>"
+  ],
+  "description": "root",
+  "main": "index.js",
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.2.0"
+  }
+}
