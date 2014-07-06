@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <title>Constellation / Yusuke SUZUKI</title>
+
+    <!-- Bootstrap -->
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<style>
+/* added styles */
+.author-me { text-decoration: underline; }
+body {
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>
+  </head>
+  <body>
+    <!-- Static navbar -->
+    <div class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <!-- <a class="navbar-brand" href="#">Project name</a> -->
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#activities">Activities</a></li>
+            <li><a href="#interests">Interests</a></li>
+            <li><a href="#softwares">Softwares</a></li>
+          </ul><!--
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="https://github.com/Constellation">GitHub</a></li>
+          </ul>
+          -->
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <div class="container row">
+                <div class="col-sm-2 col-md-1 col-lg-1">
+                    <img src="account.jpg" style="border-radius:3px;margin-top:20px;height:64px;width:64px;"></img>
+                </div>
+                <div class="col-xs-10 col-md-9 col-lg-9">
+                    <h1>Yusuke SUZUKI <small><a href="https://github.com/Constellation" style="color:#777;">Constellation</a></small></h1>
+                    <p>WebKit committer. I'm interested in ECMAScript/JavaScript, browsers, JIT compilers, OS, VMM, accelerators etc.</p>
+                </div>
+            </div>
+        </div>
+
+        <h2 id="contact">Contact</h2>
+        <p><a href="mailto:utatane.tea@gmail.com">utatane.tea@gmail.com</a> / <a href="mailto:yusukesuzuki@chromium.org">yusukesuzuki@chromium.org</a> / <a href="mailto:yusuke.suzuki@sslab.ics.keio.ac.jp">yusuke.suzuki@sslab.ics.keio.ac.jp</a></p>
+
+        <h2 id="activities">Activities</h2>
+        <ul>
+            <li>twitter: <a href="https://twitter.com/Constellation">Constellation</a></li>
+            <li>GitHub: <a href="https://github.com/Constellation">Constellation</a></li>
+        </ul>
+
+        <h2 id="interests">Interests</h2>
+        <ul>
+            <li>Web Technology
+                <ul>
+                <li>ECMAScript</li>
+                <li>Web Browsers
+                    <ul>
+                    <li>Rendering</li>
+                    <li>CSS Selector matching</li>
+                    <li>CSS JIT Compile</li>
+                    </ul>
+                </li>
+                </ul>
+            </li>
+            <li>System Softwares
+                <ul>
+                <li>VMM</li>
+                <li>Operating Systems</li>
+                </ul>
+            </li>
+            <li>Accelerators: GPU, FPGA, Intel Xeon Phi</li>
+            <li>VM, Compiler and JIT Compiler</li>
+        </ul>
+
+        <h2 id="softwares">Softwares</h2>
+        <h3>iv / lv5: ECMAScript engine</h3>
+        <p><a href="https://github.com/Constellation/iv">https://github.com/Constellation/iv</a></p>
+        <p>iv / lv5 is a new ECMAScript engine written in C++, that conforms <a href="http://ecma-international.org/ecma-262/5.1/">ECMA262 5.1 specification</a> completely.</p>
+        <p>It includes ECMAScript lexer, parser, RegisterVM, baseline JIT compiler for x86_64.</p>
+
+        <h3>ECMAScript languages libraries</h3>
+
+        <h4>escodegen</h4>
+        <p><a href="https://github.com/Constellation/escodegen">https://github.com/Constellation/escodegen</a></p>
+        <p>escodegen is an ECMAScript unparser. It accepts <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API">JavaScript AST</a> and generates valid JavaScript code.</p>
+        <p>The ecosystem composed of these tools is described in this<a href="http://aosd.net/2013/escodegen.html">paper</a>.</p>
+
+        <h4>esmangle</h4>
+        <p><a href="https://github.com/Constellation/esmangle">https://github.com/Constellation/esmangle</a></p>
+        <p>escodegen is an ECMAScript minifier. It accepts <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API">JavaScript AST</a> and generates minified and optimized JavaScript code.</p>
+
+        <h4>escope</h4>
+        <p><a href="https://github.com/Constellation/escope">https://github.com/Constellation/escope</a></p>
+        <p>escope is an ECMAScript scope analyzer. It accepts AST and analyze scope and variable information.</p>
+
+        <h4>estraverse</h4>
+        <p><a href="https://github.com/Constellation/estraverse">https://github.com/Constellation/estraverse</a></p>
+        <p>escodegen is a traversal library for JavaScript AST. It accepts <a href="https://developer.mozilla.org/en-US/docs/Mozilla/Projects/SpiderMonkey/Parser_API">JavaScript AST</a> and traverse it.</p>
+
+        <h4>doctrine</h4>
+        <p><a href="https://github.com/Constellation/doctrine">https://github.com/Constellation/doctrine</a></p>
+        <p>doctrine is a JSDoc parser with complete Type annotation support. It is used in <a href="http://www.eclipse.org/orion/">Eclipse Orion</a>'s JSDoc support.</p>
+
+        <h3>Taberareloo</h3>
+        <p><a href="https://github.com/Constellation/taberareloo">https://github.com/Constellation/taberareloo</a></p>
+        <p>Taberareloo is a Google Chrome extension to support cross posting to many social services</p>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="bower_components/jquery/dist/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>
