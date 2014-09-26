@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Does Promise.cast exist?</title>
+</head>
+<body>
+<script>
+(function () {
+    if (typeof Promise === 'undefined') {
+        alert('Promise doesn\'t exist');
+    } else if (typeof Promise.cast !== 'undefined') {
+        alert('Promise.cast exists');
+    } else {
+        alert('Promise.cast doesn\'t exist');
+    }
+}());
+</script>
+</body>
+</html>
